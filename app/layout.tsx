@@ -2,7 +2,6 @@ import '../styles/globals.css';
 import React from 'react';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
-import EqStrip from '../components/layout/EqStrip';
 import { AuthProvider } from '../context/AuthContext';
 
 export const metadata = {
@@ -16,7 +15,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <AuthProvider>
           <Header />
-          <EqStrip />
           <main style={{ flex: 1 }}>
             {children}
           </main>

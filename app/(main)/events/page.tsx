@@ -1,12 +1,13 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getEvents } from '@/lib/api';
-import { Event } from '../../../types';
+import { getLectureSeries } from '@/lib/api';
+import { LectureSeries } from '../../../types';
 
-function parseDateParts(dateStr: string) {
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return { day: dateStr, mon: '' };
+function parseDateParts(iso?: string) {
+  if (!iso) return { day: '—', mon: '' };
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return { day: '—', mon: '' };
   return {
     day: d.getDate().toString(),
     mon: d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }),
@@ -14,13 +15,13 @@ function parseDateParts(dateStr: string) {
 }
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>([]);
+  const [series, setSeries] = useState<LectureSeries[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    getEvents()
-      .then(data => setEvents(data.data || []))
+    getLectureSeries()
+      .then(data => setSeries(data.data || []))
       .catch(() => setError('Could not load events.'))
       .finally(() => setLoading(false));
   }, []);
@@ -30,43 +31,54 @@ export default function EventsPage() {
       <div className="wrap">
         <div className="sec-head">
           <div className="sec-label"><b>iii</b>Events</div>
-          <h2 className="sec-title">All <em>events</em>.</h2>
+          <h2 className="sec-title">Conferences, workshops &amp; <em>gatherings</em>.</h2>
         </div>
 
         {loading && (
           <div style={{ padding: '40px 0', color: 'var(--tx4)', fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase' }}>
-            Loading events…
+            Loading…
           </div>
         )}
         {error && (
           <div style={{ padding: '40px 0', color: '#8c1c1c', fontSize: 12 }}>{error}</div>
         )}
-        {!loading && !error && events.length === 0 && (
+        {!loading && !error && series.length === 0 && (
           <div style={{ padding: '40px 0', color: 'var(--tx4)', fontSize: 12 }}>No events available yet.</div>
         )}
 
-        {!loading && !error && events.length > 0 && (
+        {!loading && !error && series.length > 0 && (
           <div className="ev-list">
-            {events.map((ev, i) => {
-              const { day, mon } = parseDateParts(ev.date);
-              const speakers = Array.isArray(ev.speakers) ? ev.speakers : [];
+            {series.map(ls => {
+              const { day, mon } = parseDateParts(ls.dateTime?.start);
+              const lecturers = ls.lecturerDetails || [];
               return (
-                <Link key={ev.id || i} href={`/events/${ev.id}`} className="ev">
+                <Link key={ls.id} href={`/lecture-series/${ls.id}`} className="ev">
                   <div className="ev-dc">
                     <b>{day}</b>
                     <div className="ym">{mon}</div>
                   </div>
                   <div>
-                    <h3>{ev.name}</h3>
-                    {ev.description && (
-                      <p className="ev-desc">{ev.description.slice(0, 140)}{ev.description.length > 140 ? '…' : ''}</p>
+                    <h3>{ls.title}</h3>
+                    {ls.description && (
+                      <p className="ev-desc">{ls.description.slice(0, 160)}{ls.description.length > 160 ? '…' : ''}</p>
                     )}
-                    {speakers.length > 0 && (
-                      <p className="ev-spk"><b>Speakers:</b> {speakers.join(', ')}</p>
+                    {lecturers.length > 0 && (
+                      <p className="ev-spk"><b>Speakers:</b> {lecturers.map(l => l.name).join(', ')}</p>
                     )}
-                    {ev.location && <div className="ev-meta">{ev.location}</div>}
+                    {ls.dateTime?.schedule && (
+                      <div className="ev-meta">{ls.dateTime.schedule}</div>
+                    )}
                   </div>
-                  {ev.type && <div className="ev-tag">{ev.type}</div>}
+                  {ls.thumbnail ? (
+                    <img
+                      src={ls.thumbnail}
+                      alt={ls.title}
+                      onError={e => (e.currentTarget.style.display = 'none')}
+                      style={{ width: 100, height: 70, objectFit: 'cover', alignSelf: 'start', marginTop: 4, border: '1px solid var(--rule)' }}
+                    />
+                  ) : (
+                    <div className="ev-tag">{ls.mode}</div>
+                  )}
                 </Link>
               );
             })}

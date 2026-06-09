@@ -42,17 +42,34 @@ export interface Colloquium {
   id: string;
   name: string;
   speaker?: string;
+  department?: string;
   abstract: string;
   date: string;
   time?: string;
   location?: string;
-  department?: string;
   speakerBio?: string;
   video?: string;
   thumbnail?: string;
+  poster?: string;
+  regFormLink?: string;
   materials?: { title: string; url: string; fileType?: string }[];
   tags?: string[];
   published?: boolean;
+  createdAt?: string;
+}
+
+export interface LectureSeries {
+  id: string;
+  title: string;
+  description?: string;
+  thumbnail?: string;
+  lecturerDetails: { name: string; affiliation?: string }[];
+  dateTime: { start?: string; end?: string; schedule?: string };
+  mode: 'online' | 'offline';
+  noOfClasses?: number;
+  regFormLink?: string;
+  toContact: { name: string; email?: string; phone?: string; role?: string }[];
+  supplements: { url: string; name?: string; type?: string; source?: string }[];
   createdAt?: string;
 }
 

@@ -1,59 +1,113 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-// Token management
-export const getToken = () => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('authToken');
-  }
-  return null;
-};
+// ── Token ────────────────────────────────────────────────────────────────────
+
+export const getToken = (): string | null =>
+  typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
 
 export const setToken = (token: string) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('authToken', token);
-  }
+  if (typeof window !== 'undefined') localStorage.setItem('authToken', token);
 };
 
 export const removeToken = () => {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('authToken');
-  }
+  if (typeof window !== 'undefined') localStorage.removeItem('authToken');
 };
 
-const headers = () => {
-  const token = getToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  };
-};
+// ── 401 handler ───────────────────────────────────────────────────────────────
+
+function dispatch401() {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('auth:401'));
+}
+
+async function handleRes(res: Response) {
+  if (res.status === 401) {
+    dispatch401();
+    let msg = 'Unauthorized';
+    try { const d = await res.json(); msg = d.message || d.error || msg; } catch {}
+    throw new Error(msg);
+  }
+  if (!res.ok) {
+    let msg = 'Request failed';
+    try { const d = await res.json(); msg = d.message || d.error || msg; } catch {}
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
+const authHeaders = (): HeadersInit => ({
+  Authorization: `Bearer ${getToken()}`,
+});
+
 
 export const getImageUrl = (path?: string): string => {
   if (!path) return '/placeholders/default.jpg';
+  if (path.startsWith('http')) return path;
   if (path.startsWith('/uploads/')) {
-    const base = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')
-      .replace('/api', '');
+    const base = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace('/api', '');
     return `${base}${path}`;
   }
   return path;
 };
 
-// ==================== AUTH ====================
+// ── Normalizers ───────────────────────────────────────────────────────────────
+
+function fmtDate(iso?: string): string {
+  if (!iso) return '';
+  try { return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); }
+  catch { return iso; }
+}
+
+export function normColloquium(raw: any) {
+  const sp = raw.speaker;
+  const speakerName = typeof sp === 'string' ? sp : (sp?.name || '');
+  const speakerAff  = typeof sp === 'string' ? '' : (sp?.affiliation || '');
+  return {
+    id:          raw._id || raw.id || '',
+    name:        raw.title || raw.name || '',
+    speaker:     speakerName,
+    department:  speakerAff || raw.department || '',
+    abstract:    raw.abstract || '',
+    date:        fmtDate(raw.time) || raw.date || '',
+    time:        raw.time || '',
+    location:    raw.venue || raw.location || '',
+    video:       raw.ytLink || raw.video || '',
+    thumbnail:   raw.poster || raw.thumbnail || '',
+    poster:      raw.poster || '',
+    regFormLink: raw.reg_form_link || '',
+    speakerBio:  raw.speakerBio || '',
+    materials:   Array.isArray(raw.materials) ? raw.materials : [],
+    tags:        Array.isArray(raw.tags) ? raw.tags : [],
+    published:   raw.published ?? true,
+  };
+}
+
+export function normLectureSeries(raw: any) {
+  return {
+    id:              raw._id || raw.id || '',
+    title:           raw.title || '',
+    description:     raw.description || '',
+    thumbnail:       raw.thumbnail || '',
+    lecturerDetails: raw.lecturer_details || [],
+    dateTime:        raw.date_time || {},
+    mode:            raw.mode || 'offline',
+    noOfClasses:     raw.no_of_classes,
+    regFormLink:     raw.reg_form_link || '',
+    toContact:       raw.to_contact || [],
+    supplements:     raw.suppliments || [],
+    createdAt:       raw.createdAt || '',
+  };
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
 
 export async function login(email: string, password: string) {
   const res = await fetch(`${API_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password }),
   });
-
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error || 'Login failed');
-  }
-
-  const data = await res.json();
-  setToken(data.token);
+  const data = await handleRes(res);
+  if (data.token) setToken(data.token);
   return data;
 }
 
@@ -61,238 +115,132 @@ export async function register(name: string, email: string, password: string) {
   const res = await fetch(`${API_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, password })
+    body: JSON.stringify({ name, email, password }),
   });
-
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error || 'Registration failed');
-  }
-
-  const data = await res.json();
-  setToken(data.token);
+  const data = await handleRes(res);
+  if (data.token) setToken(data.token);
   return data;
 }
 
-export async function getCurrentUser() {
-  const res = await fetch(`${API_URL}/auth/me`, {
-    headers: headers()
-  });
 
-  if (!res.ok) throw new Error('Failed to fetch user');
-  return res.json();
-}
-
-// ==================== EVENTS ====================
-
-export async function getEvents(query?: string) {
-  const url = `${API_URL}/events${query || ''}`;
-  const res = await fetch(url);
-
-  if (!res.ok) throw new Error('Failed to fetch events');
-  return res.json();
-}
-
-export async function getEventById(id: string) {
-  const res = await fetch(`${API_URL}/events/${id}`);
-
-  if (!res.ok) throw new Error('Failed to fetch event');
-  return res.json();
-}
-
-export async function createEvent(formData: FormData) {
-  const res = await fetch(`${API_URL}/events`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${getToken()}`
-    },
-    body: formData
-  });
-
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error || 'Failed to create event');
-  }
-
-  return res.json();
-}
-
-export async function updateEvent(id: string, formData: FormData) {
-  const res = await fetch(`${API_URL}/events/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${getToken()}`
-    },
-    body: formData
-  });
-
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error || 'Failed to update event');
-  }
-
-  return res.json();
-}
-
-export async function deleteEvent(id: string) {
-  const res = await fetch(`${API_URL}/events/${id}`, {
-    method: 'DELETE',
-    headers: headers()
-  });
-
-  if (!res.ok) throw new Error('Failed to delete event');
-  return res.json();
-}
-
-// ==================== COLLOQUIUM ====================
+// ── Colloquia ─────────────────────────────────────────────────────────────────
 
 export async function getColloquium(query?: string) {
-  const url = `${API_URL}/colloquium${query || ''}`;
-  const res = await fetch(url);
-
-  if (!res.ok) throw new Error('Failed to fetch colloquium');
-  return res.json();
+  const res = await fetch(`${API_URL}/colloquia${query || ''}`);
+  const data = await handleRes(res);
+  return { ...data, data: (data.data || []).map(normColloquium) };
 }
 
 export async function getColloquiumById(id: string) {
-  const res = await fetch(`${API_URL}/colloquium/${id}`);
-
-  if (!res.ok) throw new Error('Failed to fetch colloquium');
-  return res.json();
+  const res = await fetch(`${API_URL}/colloquia/${id}`);
+  const data = await handleRes(res);
+  return { ...data, data: normColloquium(data.data) };
 }
 
 export async function createColloquium(formData: FormData) {
-  const res = await fetch(`${API_URL}/colloquium`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${getToken()}`
-    },
-    body: formData
+  const res = await fetch(`${API_URL}/colloquia`, {
+    method: 'POST', headers: authHeaders(), body: formData,
   });
-
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error || 'Failed to create colloquium');
-  }
-
-  return res.json();
+  return handleRes(res);
 }
 
 export async function updateColloquium(id: string, formData: FormData) {
-  const res = await fetch(`${API_URL}/colloquium/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${getToken()}`
-    },
-    body: formData
+  const res = await fetch(`${API_URL}/colloquia/${id}`, {
+    method: 'PUT', headers: authHeaders(), body: formData,
   });
-
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error || 'Failed to update colloquium');
-  }
-
-  return res.json();
+  return handleRes(res);
 }
 
 export async function deleteColloquium(id: string) {
-  const res = await fetch(`${API_URL}/colloquium/${id}`, {
-    method: 'DELETE',
-    headers: headers()
+  const res = await fetch(`${API_URL}/colloquia/${id}`, {
+    method: 'DELETE', headers: authHeaders(),
   });
-
-  if (!res.ok) throw new Error('Failed to delete colloquium');
-  return res.json();
+  return handleRes(res);
 }
 
-// ==================== TEAM ====================
+// ── Lecture Series ────────────────────────────────────────────────────────────
+
+export async function getLectureSeries(query?: string) {
+  const res = await fetch(`${API_URL}/lecture-series${query || ''}`);
+  const data = await handleRes(res);
+  return { ...data, data: (data.data || []).map(normLectureSeries) };
+}
+
+export async function getLectureSeriesById(id: string) {
+  const res = await fetch(`${API_URL}/lecture-series/${id}`);
+  const data = await handleRes(res);
+  return { ...data, data: normLectureSeries(data.data) };
+}
+
+export async function createLectureSeries(formData: FormData) {
+  const res = await fetch(`${API_URL}/lecture-series`, {
+    method: 'POST', headers: authHeaders(), body: formData,
+  });
+  return handleRes(res);
+}
+
+export async function updateLectureSeries(id: string, formData: FormData) {
+  const res = await fetch(`${API_URL}/lecture-series/${id}`, {
+    method: 'PUT', headers: authHeaders(), body: formData,
+  });
+  return handleRes(res);
+}
+
+export async function deleteLectureSeries(id: string) {
+  const res = await fetch(`${API_URL}/lecture-series/${id}`, {
+    method: 'DELETE', headers: authHeaders(),
+  });
+  return handleRes(res);
+}
+
+export async function addLectureSeriesSupplement(id: string, payload: object) {
+  const res = await fetch(`${API_URL}/lecture-series/${id}/suppliments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(payload),
+  });
+  return handleRes(res);
+}
+
+export async function removeLectureSeriesSupplement(id: string, url: string) {
+  const res = await fetch(`${API_URL}/lecture-series/${id}/suppliments`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ url }),
+  });
+  return handleRes(res);
+}
+
+// ── Team ──────────────────────────────────────────────────────────────────────
 
 export async function getTeam(query?: string) {
-  const url = `${API_URL}/team${query || ''}`;
-  const res = await fetch(url);
-
-  if (!res.ok) throw new Error('Failed to fetch team');
-  return res.json();
+  const res = await fetch(`${API_URL}/team${query || ''}`);
+  return handleRes(res);
 }
 
 export async function getTeamById(id: string) {
   const res = await fetch(`${API_URL}/team/${id}`);
-
-  if (!res.ok) throw new Error('Failed to fetch team member');
-  return res.json();
+  return handleRes(res);
 }
 
 export async function createTeamMember(formData: FormData) {
   const res = await fetch(`${API_URL}/team`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${getToken()}`
-    },
-    body: formData
+    method: 'POST', headers: authHeaders(), body: formData,
   });
-
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error || 'Failed to create team member');
-  }
-
-  return res.json();
+  return handleRes(res);
 }
 
 export async function updateTeamMember(id: string, formData: FormData) {
   const res = await fetch(`${API_URL}/team/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${getToken()}`
-    },
-    body: formData
+    method: 'PUT', headers: authHeaders(), body: formData,
   });
-
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error || 'Failed to update team member');
-  }
-
-  return res.json();
+  return handleRes(res);
 }
 
 export async function deleteTeamMember(id: string) {
   const res = await fetch(`${API_URL}/team/${id}`, {
-    method: 'DELETE',
-    headers: headers()
+    method: 'DELETE', headers: authHeaders(),
   });
-
-  if (!res.ok) throw new Error('Failed to delete team member');
-  return res.json();
+  return handleRes(res);
 }
 
-// ==================== ADMIN ====================
-
-export async function getAdminStats() {
-  const res = await fetch(`${API_URL}/admin/stats`, {
-    headers: headers()
-  });
-
-  if (!res.ok) throw new Error('Failed to fetch stats');
-  return res.json();
-}
-
-export async function getAllUsers() {
-  const res = await fetch(`${API_URL}/admin/users`, {
-    headers: headers()
-  });
-
-  if (!res.ok) throw new Error('Failed to fetch users');
-  return res.json();
-}
-
-export async function updateUserRole(userId: string, role: string) {
-  const res = await fetch(`${API_URL}/admin/users/${userId}/role`, {
-    method: 'PUT',
-    headers: headers(),
-    body: JSON.stringify({ role })
-  });
-
-  if (!res.ok) throw new Error('Failed to update user role');
-  return res.json();
-}

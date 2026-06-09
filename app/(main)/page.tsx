@@ -1,7 +1,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getEvents, getColloquium } from '@/lib/api';
+import { getLectureSeries, getColloquium } from '@/lib/api';
+import EquationStrip from '@/components/ui/EquationStrip';
 
 function parseDateParts(dateStr: string) {
   const d = new Date(dateStr);
@@ -13,15 +14,15 @@ function parseDateParts(dateStr: string) {
 }
 
 export default function Home() {
-  const [events, setEvents] = useState<any[]>([]);
+  const [series, setSeries] = useState<any[]>([]);
   const [colloquia, setColloquia] = useState<any[]>([]);
 
   useEffect(() => {
-    getEvents().then(d => setEvents(d.data || [])).catch(() => {});
+    getLectureSeries().then(d => setSeries(d.data || [])).catch(() => {});
     getColloquium().then(d => setColloquia(d.data || [])).catch(() => {});
   }, []);
 
-  const latestEvent = events[0];
+  const latestEvent = series[0];
   const latestColl = colloquia[0];
 
   return (
@@ -53,10 +54,10 @@ export default function Home() {
                 <div className="aside-lbl">Latest Event</div>
                 <div className="aside-title">
                   <em className="aside-arr">→</em>
-                  {latestEvent ? latestEvent.name : 'Annual National Conference'}
+                  {latestEvent ? latestEvent.title : 'Annual National Conference'}
                 </div>
                 <div className="aside-meta">
-                  {latestEvent ? `${latestEvent.date}${latestEvent.location ? ' · ' + latestEvent.location : ''}` : 'Baker Building'}
+                  {latestEvent ? `${latestEvent.mode}${latestEvent.dateTime?.schedule ? ' · ' + latestEvent.dateTime.schedule : ''}` : 'Baker Building'}
                 </div>
               </Link>
 
@@ -83,6 +84,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <EquationStrip />
 
       {/* What We Do */}
       <section className="section alt">
@@ -117,35 +120,27 @@ export default function Home() {
       </section>
 
       {/* Recent events */}
-      {events.length > 0 && (
+      {series.length > 0 && (
         <section className="section">
           <div className="wrap">
             <div className="sec-head">
               <div className="sec-label"><b>iii</b>Events</div>
               <h2 className="sec-title">Recent &amp; upcoming <em>events</em>.</h2>
             </div>
-            <div className="ev-list">
-              {events.slice(0, 4).map((ev, i) => {
-                const { day, mon } = parseDateParts(ev.date);
-                const speakers = Array.isArray(ev.speakers) ? ev.speakers : [];
-                return (
-                  <Link key={ev.id || i} href={`/events/${ev.id}`} className="ev">
-                    <div className="ev-dc">
-                      <b>{day}</b>
-                      <div className="ym">{mon}</div>
-                    </div>
-                    <div>
-                      <h3>{ev.name}</h3>
-                      {ev.description && <p className="ev-desc">{ev.description.slice(0, 120)}{ev.description.length > 120 ? '…' : ''}</p>}
-                      {speakers.length > 0 && (
-                        <p className="ev-spk"><b>Speakers:</b> {speakers.join(', ')}</p>
-                      )}
-                      {ev.location && <div className="ev-meta">{ev.location}</div>}
-                    </div>
-                    {ev.type && <div className="ev-tag">{ev.type}</div>}
-                  </Link>
-                );
-              })}
+            <div className="ls-grid">
+              {series.slice(0, 4).map((ls: any) => (
+                <Link key={ls.id} href={`/lecture-series/${ls.id}`} className="ls-card">
+                  <div className="ls-mode">{ls.mode}</div>
+                  <div className="ls-card-title">{ls.title}</div>
+                  {ls.lecturerDetails?.length > 0 && (
+                    <div className="ls-card-meta">{ls.lecturerDetails.map((l: any) => l.name).join(', ')}</div>
+                  )}
+                  {ls.description && <div className="ls-card-desc">{ls.description}</div>}
+                  {ls.dateTime?.schedule && (
+                    <div className="ls-card-meta" style={{ marginTop: 10 }}>{ls.dateTime.schedule}</div>
+                  )}
+                </Link>
+              ))}
             </div>
             <div style={{ marginTop: 32 }}>
               <Link href="/events" className="btn">View all events</Link>

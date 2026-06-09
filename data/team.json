@@ -1,0 +1,184 @@
+[
+  {
+    "id":1,
+    "name": "Ritom Bid",
+    "role": "President",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":2,
+    "name": "Baibhab Kar",
+    "role": "Vice-President",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":3,
+    "name": "Nanda Gopal Raha",
+    "role": "Treasurer",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":4,
+    "name": "Sourin Debnath",
+    "role": "Secretary",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":5,
+    "name": "Shawon Kumar Pani",
+    "role": "Assistant Secretary",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":6,
+    "name": "Sumedha Mallick",
+    "role": "PR and Media Committee Head",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":7,
+    "name": "Aratrika Sengupta",
+    "role": "PR and Media Committee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":8,
+    "name": "Sayantan Majumder",
+    "role": "PR and Media Committee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":9,
+    "name": "Irene Altaf",
+    "role": "PR and Media Committee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":10,
+    "name": "Deepan Dhawa",
+    "role": "PR and Media Committee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":11,
+    "name": "Paramita Patra",
+    "role": "PR and Media Committee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":12,
+    "name": "Sampriti Das",
+    "role": "PR and Media Committee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":13,
+    "name": "Archisman Chatterjee",
+    "role": "Event Coordination Commitee Head",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":14,
+    "name": "Krishnendu Mandal",
+    "role": "Event Coordination Commitee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":15,
+    "name": "Swarnava Bhattacharjee",
+    "role": "Event Coordination Commitee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":16,
+    "name": "Mrinmay Das Adhikary",
+    "role": "Event Coordination Commitee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":17,
+    "name": "Eeshani Ghosh",
+    "role": "Event Coordination Commitee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":18,
+    "name": "Suhana Adhikary",
+    "role": "Event Coordination Commitee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":19,
+    "name": "Rahul Das",
+    "role": "Event Coordination Commitee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":20,
+    "name": "Dwaipayan Mukherjee",
+    "role": "Technical Committee Head",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":21,
+    "name": "Arka Basak",
+    "role": "Technical Committee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":22,
+    "name": "Aritra Bakshi",
+    "role": "Technical Committee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":23,
+    "name": "Samadrito Joarder",
+    "role": "Technical Committee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":24,
+    "name": "Rohan Chakraborty",
+    "role": "Technical Committee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":25,
+    "name": "Suvamay Pramanik",
+    "role": "PhD Scholar",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  },
+  {
+    "id":26,
+    "name": "Amit Das",
+    "role": "PhD Scholar",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "@example.com"
+  }
+]

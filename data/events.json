@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "name": "CMMSSP 2025",
+    "type": "general",
+    "description": "A Two Day Annual National Conference on Condensed Matter, Material Science and Statistical Physics held by the Department of Physics, Presidency University Kolkata.",
+    "tagline": "Exploring the dimensions of Physics.",
+    "poster": "/placeholders/ai-panel.jpg",
+    "photos": ["/placeholders/ai-photo1.jpg", "/placeholders/ai-photo2.jpg"],
+    "date": "2025-11-21 and 2025-11-22 10:00 A.M.",
+    "location": "P.C.M. Auditorium in Baker Building",
+    "organizer": "Department of Physics",
+    "tags": ["Condensed Matter", "Material Science", "Statistical Physics", "Conference"],
+    "rsvpLink": "",
+    "featured": false,
+    "past": true,
+    "video": "",
+    "resources": [],
+    "speakers": ["Dr. Basudev Pradhan", "Dr. Tutul Biswas", "Dr. Ankur Sensharma"],
+    "duration": "2 Days",
+    "audience": "Open to all"
+  },
+
+  {
+    "id": 2,
+    "name": "Modern Trends In Particle Physics",
+    "type": "workshop",
+    "description": "A One Day Workshop focussing on modern research in Particle Physics followed by a panel discussion consisting of some eminent researchers in the field.",
+    "tagline": "Dive into the Particle and High Energy realm.",
+    "poster": "/placeholders/particle.jpg",
+    "photos": ["/placeholders/particle1.jpg"],
+    "date": "2025-31-10 09:30 A.M.",
+    "location": "P.C.M. Auditorium in Baker Building",
+    "organizer": "Department of Physics",
+    "tags": ["High Energy Physics", "Particle Physics", "Workshop"],
+    "rsvpLink": "",
+    "featured": false,
+    "past": true,
+    "video": "",
+    "resources": [],
+    "speakers": ["Prof. Anindya Datta", "Prof. Koushik Dutta", "Prof. Sourov Roy", "Prof. Naba K. Mondal"],
+    "duration": "7 hours 30 mins",
+    "audience": "Advanced undergraduate and postgraduate students"
+  },
+
+  {
+    "id": 3,
+    "name": "CMMSSP 2024",
+    "type": "general",
+    "description": "A Two Day Annual National Conference on Condensed Matter, Material Science and Statistical Physics held by the Department of Physics, Presidency University Kolkata.",
+    "tagline": "Uncovering the depths in different fields within Physics.",
+    "poster": "/placeholders/research.jpg",
+    "photos": [],
+    "date": "2024-08-09 and 2024-08-10 11:00 A.M.",
+    "location": "P.C.M. Auditorium in Baker Building",
+    "organizer": "Department of Physics",
+    "tags": ["Research", "Meetup", "Conference"],
+    "rsvpLink": "",
+    "featured": false,
+    "past": true,
+    "video": "",
+    "resources": [],
+    "speakers": ["Dr. Abhishek Chaudhuri", "Prof. Anirban Sain", "Dr. Biplab Pal", "Dr. Rabindra Nath Gayen"],
+    "duration": "2 Days",
+    "audience": "Undergraduate and postgraduate students"
+  }
+
+]

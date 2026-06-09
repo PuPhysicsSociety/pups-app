@@ -1,0 +1,42 @@
+[
+  {
+    "id": 101,
+    "name": "Unlocking the Potential of Activated Carbon from Waste Biomass: Nature’s Solution for Industrial Energy Challenges",
+    "speaker": "Dwaipayan Mukherjee, Department of Physics (Third Year Undergraduate), Presidency University",
+    "abstract": "With the rapid increase in population, the globe is experiencing a significant surge in carbon emissions, production of bio-waste, and the need for sustainable and clean energy. Supercapacitors based on activated carbon present a promising answer to these issues. Derived from treated bio-waste, activated carbon offers a large surface area and remarkable electrochemical performance, enabling supercapacitors to achieve high power density and rapid charge–discharge performance.",
+    "video": "https://www.youtube.com/embed/w1iAuKD-9Ks?si=ivugKvARbKx-xKWV",
+    "materials": [],
+    "date": "2025-11-12 15:30",
+    "location": "Amal Kumar Raychaudhuri Lecture Hall (PLT-2), Department of Physics, PU"
+  },
+  {
+    "id": 102,
+    "name": "Neutron Scattering through a Spin Lattice: A Macroscopic Analog",
+    "speaker": "Nanda Gopal Raha, Department of Physics (Third Year Undergraduate), Presidency University",
+    "abstract": "We have modeled neutron scattering through a spin–lattice analogy using a classical setup where a magnet moves across a carrom board under the influence of four fixed ring magnets. The resulting magnetic potential field mimics spin–lattice interactions, and numerical simulations combined with experimental trials reproduce scattering-like trajectories. This approach highlights how lattice symmetry and spin–dependent effects can be visualized in a macroscopic analog, offering an accessible framework to explore neutron spin–lattice dynamics and their role in scattering phenomena.",
+    "video": "https://www.youtube.com/embed/d8YwI7jRlwo?si=evR7RrmVOAZVPZFd",
+    "materials": [],
+    "date": "2025-11-26 15:45",
+    "location": "Amal Kumar Raychaudhuri Lecture Hall (PLT-2), Department of Physics, PU"
+  },
+  {
+    "id": 103,
+    "name": "Gravitational Wave signal detection using Particle Swarm Optimization",
+    "speaker": "Aritra Bakshi, Department of Physics (Third Year Undergraduate), Presidency University",
+    "abstract": "Gravitational-wave parameter estimation relies on maximizing waveform matches over a high-dimensional parameter space, which becomes computationally expensive with traditional grid-based searches. In this talk, I demonstrate the use of Particle Swarm Optimization (PSO) as an efficient alternative for recovering compact binary parameters from gravitational-wave data. Using matched filtering as the objective function, PSO is applied to recover component masses and spins from simulated signals and real LIGO detector strain within the PyCBC framework. Injection-and-recovery studies show that PSO achieves accurate parameter recovery with significantly reduced computational cost compared to grid searches, particularly in higher dimensions. The results highlight PSO’s effectiveness for scalable and low-latency gravitational-wave data analysis.",
+    "video": "https://www.youtube.com/embed/74vvTQQx8wY?si=z703cGFkm8E_fhN5",
+    "materials": [],
+    "date": "2026-03-11 15:45",
+    "location": "Amal Kumar Raychaudhuri Lecture Hall (PLT-2), Department of Physics, PU"
+  },
+  {
+    "id": 104,
+    "name": "Waste to Watts: Potassium Acetate-Activated Litchi Peel as a Green Electrode for Supercapacitors",
+    "speaker": "Suvamoy Pramanik (PhD Scholar), Department of Physics, Presidency University",
+    "abstract": "The development of low-cost, high-performance, and eco-friendly electrode materials is crucial for advancing sustainable energy storage systems. In this study, litchi peel, an abundant agricultural waste, was employed as a carbon precursor and activated through a one-step chemical activation using potassium acetate (CH3COOK). The resulting biochar demonstrated an exceptionally high specific capacitance of 428.23 F/g at 2 mV/s, outperforming those activated with acetic acid (CH3COOH) and potassium hydroxide (KOH), which exhibited capacitances of 229.37 F/g and 38.4 F/g, respectively. The CH₃COOK-activated carbon also exhibited high Brunauer–Emmett–Teller (BET) surface area, indicative of a highly porous architecture conducive to enhanced ion transport. Electrochemical cycling revealed 75% capacitance retention after 4000 cycles, affirming the material's long-term stability. Unlike conventional activators such as KOH, potassium acetate is a milder, biodegradable agent, aligning with principles      of green chemistry. This study highlights the potential of CH3COOK as a sustainable and effective activating agent, paving the way for environmentally benign fabrication of high-performance carbon-based electrodes from biowaste. The approach offers a promising route for scalable and cost-effective supercapacitor production, while contributing to circular economy and waste valorization strategies.",
+    "video": "https://www.youtube.com/embed/V-T4gu5nPWo?si=brAXvKjO1SLcfN7B",
+    "materials": [],
+    "date": "2026-03-18 15:45",
+    "location": "Amal Kumar Raychaudhuri Lecture Hall (PLT-2), Department of Physics, PU"
+  }
+]

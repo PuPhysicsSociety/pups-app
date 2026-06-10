@@ -6,6 +6,7 @@ import {
   getColloquium, createColloquium, updateColloquium, deleteColloquium,
   getLectureSeries, createLectureSeries, updateLectureSeries, deleteLectureSeries,
   getTeam, createTeamMember, updateTeamMember, deleteTeamMember, getImageUrl,
+  uploadToCloudinary,
 } from '../../lib/api';
 
 // ── tiny helpers ──────────────────────────────────────────────────────────────
@@ -14,6 +15,16 @@ const parseArr = (v: any): any[] => {
   if (Array.isArray(v)) return v;
   if (typeof v === 'string') { try { return JSON.parse(v); } catch {} }
   return [];
+};
+
+// Converts any ISO date string to the YYYY-MM-DDTHH:MM format required by datetime-local inputs
+const toDateTimeLocal = (iso?: string): string => {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toISOString().slice(0, 16);
+  } catch { return ''; }
 };
 
 function Msg({ ok, err }: { ok?: string; err?: string }) {
@@ -57,7 +68,7 @@ function OverviewPanel({ onTab }: { onTab: (t: string) => void }) {
 
 const CQ_EMPTY: any = {
   title:'', speakerName:'', speakerAff:'', abstract:'', time:'',
-  venue:'', ytLink:'', reg_form_link:'', tagsRaw:'', published:true,
+  venue:'', ytLink:'', reg_form_link:'', tagsRaw:'', published:true, existingPoster:'',
 };
 
 function ColloquiaPanel() {
@@ -86,12 +97,13 @@ function ColloquiaPanel() {
       speakerName: c.speaker||'',
       speakerAff: c.department||'',
       abstract: c.abstract||'',
-      time: c.time||'',
+      time: toDateTimeLocal(c.time),
       venue: c.location||'',
       ytLink: c.video||'',
       reg_form_link: c.regFormLink||'',
       tagsRaw: parseArr(c.tags).join(', '),
       published: c.published??true,
+      existingPoster: c.poster||'',
     });
     setEditId(c.id); setOpen(true); window.scrollTo({top:0,behavior:'smooth'});
   };
@@ -99,19 +111,21 @@ function ColloquiaPanel() {
   const submit = async (e:React.FormEvent) => {
     e.preventDefault(); setBusy(true); setErr('');
     try {
-      const fd = new FormData();
-      fd.append('title', form.title);
-      fd.append('speaker', JSON.stringify({name:form.speakerName, affiliation:form.speakerAff}));
-      fd.append('abstract', form.abstract);
-      fd.append('time', form.time);
-      fd.append('venue', form.venue);
-      fd.append('ytLink', form.ytLink);
-      fd.append('reg_form_link', form.reg_form_link);
-      fd.append('tags', JSON.stringify((form.tagsRaw||'').split(',').map((x:string)=>x.trim()).filter(Boolean)));
-      fd.append('published', String(form.published));
-      if (poster) fd.append('poster', poster);
-      if (editId) { await updateColloquium(editId,fd); setOk('Updated'); }
-      else        { await createColloquium(fd);         setOk('Created'); }
+      let posterUrl = form.existingPoster || undefined;
+      if (poster) posterUrl = await uploadToCloudinary(poster, 'physics-society/colloquia/posters');
+      const body: any = {
+        title: form.title,
+        speaker: {name:form.speakerName, affiliation:form.speakerAff},
+        abstract: form.abstract,
+        time: form.time || undefined,
+        venue: form.venue || undefined,
+        ytLink: form.ytLink || undefined,
+        reg_form_link: form.reg_form_link || undefined,
+        published: form.published,
+      };
+      if (posterUrl) body.poster = posterUrl;
+      if (editId) { await updateColloquium(editId, body); setOk('Updated'); }
+      else        { await createColloquium(body);          setOk('Created'); }
       setTimeout(()=>setOk(''),3000); reset(); load();
     } catch(ex:any) { setErr(ex.message||'Save failed'); }
     finally { setBusy(false); }
@@ -180,8 +194,9 @@ function ColloquiaPanel() {
 // ── Lecture Series ────────────────────────────────────────────────────────────
 
 const LS_EMPTY: any = {
-  title:'', mode:'offline', description:'', dateStart:'', dateEnd:'', schedule:'',
-  noOfClasses:'', reg_form_link:'',
+  title:'', mode:'offline', description:'',
+  dateStartDate:'', dateStartTime:'', dateEndDate:'', dateEndTime:'',
+  schedule:'', noOfClasses:'', reg_form_link:'', existingThumb:'',
   lecturers:[],
   contacts:[],
 };
@@ -211,11 +226,14 @@ function LectureSeriesPanel() {
       title: ls.title,
       mode: ls.mode||'offline',
       description: ls.description||'',
-      dateStart: ls.dateTime?.start||'',
-      dateEnd:   ls.dateTime?.end||'',
+      dateStartDate: ls.dateTime?.start ? new Date(ls.dateTime.start).toISOString().slice(0,10) : '',
+      dateStartTime: ls.dateTime?.start ? new Date(ls.dateTime.start).toISOString().slice(11,16) : '',
+      dateEndDate:   ls.dateTime?.end   ? new Date(ls.dateTime.end).toISOString().slice(0,10) : '',
+      dateEndTime:   ls.dateTime?.end   ? new Date(ls.dateTime.end).toISOString().slice(11,16) : '',
       schedule:  ls.dateTime?.schedule||'',
       noOfClasses: ls.noOfClasses||'',
       reg_form_link: ls.regFormLink||'',
+      existingThumb: ls.thumbnail||'',
       lecturers: ls.lecturerDetails||[],
       contacts:  ls.toContact||[],
     });
@@ -225,18 +243,25 @@ function LectureSeriesPanel() {
   const submit = async (e:React.FormEvent) => {
     e.preventDefault(); setBusy(true); setErr('');
     try {
-      const fd = new FormData();
-      fd.append('title', form.title);
-      fd.append('mode', form.mode);
-      fd.append('description', form.description);
-      fd.append('reg_form_link', form.reg_form_link);
-      if (form.noOfClasses) fd.append('no_of_classes', String(form.noOfClasses));
-      fd.append('date_time', JSON.stringify({start:form.dateStart,end:form.dateEnd,schedule:form.schedule}));
-      fd.append('lecturer_details', JSON.stringify(form.lecturers||[]));
-      fd.append('to_contact', JSON.stringify(form.contacts||[]));
-      if (thumb) fd.append('thumbnail', thumb);
-      if (editId) { await updateLectureSeries(editId,fd); setOk('Updated'); }
-      else        { await createLectureSeries(fd);         setOk('Created'); }
+      let thumbUrl = form.existingThumb || undefined;
+      if (thumb) thumbUrl = await uploadToCloudinary(thumb, 'physics-society/lecture-series/thumbnails');
+      const body: any = {
+        title: form.title,
+        mode: form.mode,
+        description: form.description || undefined,
+        reg_form_link: form.reg_form_link || undefined,
+        date_time: {
+          start:    form.dateStartDate ? `${form.dateStartDate}T${form.dateStartTime||'00:00'}:00.000Z` : undefined,
+          end:      form.dateEndDate   ? `${form.dateEndDate}T${form.dateEndTime||'00:00'}:00.000Z`   : undefined,
+          schedule: form.schedule || undefined,
+        },
+        lecturer_details: form.lecturers||[],
+        to_contact: form.contacts||[],
+      };
+      if (form.noOfClasses) body.no_of_classes = Number(form.noOfClasses);
+      if (thumbUrl) body.thumbnail = thumbUrl;
+      if (editId) { await updateLectureSeries(editId, body); setOk('Updated'); }
+      else        { await createLectureSeries(body);          setOk('Created'); }
       setTimeout(()=>setOk(''),3000); reset(); load();
     } catch(ex:any) { setErr(ex.message||'Save failed'); }
     finally { setBusy(false); }
@@ -272,8 +297,18 @@ function LectureSeriesPanel() {
               </select>
             </AField>
             <AField label="No. of Classes"><input type="number" min="1" className="adm-input" value={form.noOfClasses} onChange={e=>s('noOfClasses',e.target.value)} /></AField>
-            <AField label="Start Date"><input type="datetime-local" className="adm-input" value={form.dateStart} onChange={e=>s('dateStart',e.target.value)} /></AField>
-            <AField label="End Date"><input type="datetime-local" className="adm-input" value={form.dateEnd} onChange={e=>s('dateEnd',e.target.value)} /></AField>
+            <AField label="Start Date">
+              <div style={{display:'flex',gap:6}}>
+                <input type="date" className="adm-input" value={form.dateStartDate} onChange={e=>s('dateStartDate',e.target.value)} />
+                <input type="time" className="adm-input" value={form.dateStartTime} onChange={e=>s('dateStartTime',e.target.value)} />
+              </div>
+            </AField>
+            <AField label="End Date">
+              <div style={{display:'flex',gap:6}}>
+                <input type="date" className="adm-input" value={form.dateEndDate} onChange={e=>s('dateEndDate',e.target.value)} />
+                <input type="time" className="adm-input" value={form.dateEndTime} onChange={e=>s('dateEndTime',e.target.value)} />
+              </div>
+            </AField>
             <AField label="Schedule (text)"><input className="adm-input" value={form.schedule} onChange={e=>s('schedule',e.target.value)} placeholder="Every Saturday 10am" /></AField>
             <AField label="Registration Form Link"><input type="url" className="adm-input" value={form.reg_form_link} onChange={e=>s('reg_form_link',e.target.value)} /></AField>
             <AField label="Thumbnail"><input type="file" accept="image/*" className="adm-file-input" onChange={e=>setThumb(e.target.files?.[0]||null)} /></AField>

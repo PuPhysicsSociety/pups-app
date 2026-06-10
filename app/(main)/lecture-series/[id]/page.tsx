@@ -140,16 +140,16 @@ export default function LectureSeriesDetail() {
               display: 'grid',
               gridTemplateColumns: total === 1 ? '1fr' : total === 2 ? '1fr 1fr' : '1fr 1fr 1fr',
               gap: 2,
-              height: 320,
               border: `1px solid ${T.rule}`,
               overflow: 'hidden',
+              maxWidth: 640,
             }}>
               {images.map((img, i) => (
-                <div key={i} style={{ overflow: 'hidden', position: 'relative', borderRight: i < total - 1 ? `1px solid ${T.rule}` : 'none' }}>
+                <div key={i} style={{ overflow: 'hidden', borderRight: i < total - 1 ? `1px solid ${T.rule}` : 'none' }}>
                   <img
                     src={img.src}
                     alt={img.alt ?? ''}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    style={{ width: '100%', height: 'auto', display: 'block' }}
                   />
                 </div>
               ))}

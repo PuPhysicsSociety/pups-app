@@ -30,7 +30,7 @@ export default function Home() {
       {/* Hero */}
       <section className="section" style={{ borderBottom: '1px solid var(--rule)' }}>
         <div className="wrap">
-          <div className="home-hero" style={{ border: 'none', padding: '72px 0 64px' }}>
+          <div className="home-hero" style={{ border: 'none' }}>
             <div>
               <div className="home-kicker">Presidency University · Est. 2025</div>
               <h1 className="home-h1">

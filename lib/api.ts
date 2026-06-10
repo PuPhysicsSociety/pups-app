@@ -1,5 +1,5 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ;
-if (!API_URL) throw new Error('NEXT_PUBLIC_API_URL is not defined');
+const API = '/api';
+
 // ── Token ────────────────────────────────────────────────────────────────────
 
 export const getToken = (): string | null =>
@@ -38,16 +38,43 @@ const authHeaders = (): HeadersInit => ({
   Authorization: `Bearer ${getToken()}`,
 });
 
+const jsonHeaders = (): HeadersInit => ({
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${getToken()}`,
+});
 
 export const getImageUrl = (path?: string): string => {
   if (!path) return '/placeholders/default.jpg';
   if (path.startsWith('http')) return path;
-  if (path.startsWith('/uploads/')) {
-    const base = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace('/api', '');
-    return `${base}${path}`;
-  }
   return path;
 };
+
+// ── Cloudinary upload helper ──────────────────────────────────────────────────
+
+export async function uploadToCloudinary(file: File, folder: string): Promise<string> {
+  const signRes = await fetch(`${API}/cloudinary/sign`, {
+    method: 'POST',
+    headers: jsonHeaders(),
+    body: JSON.stringify({ folder, resource_type: 'image' }),
+  });
+  if (!signRes.ok) throw new Error('Could not get upload signature');
+  const { signature, timestamp, cloudName, apiKey, folder: f } = await signRes.json();
+
+  const form = new FormData();
+  form.append('file', file);
+  form.append('api_key', apiKey);
+  form.append('timestamp', String(timestamp));
+  form.append('signature', signature);
+  form.append('folder', f);
+
+  const uploadRes = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+    { method: 'POST', body: form }
+  );
+  if (!uploadRes.ok) throw new Error('Cloudinary upload failed');
+  const { secure_url } = await uploadRes.json();
+  return secure_url as string;
+}
 
 // ── Normalizers ───────────────────────────────────────────────────────────────
 
@@ -101,7 +128,7 @@ export function normLectureSeries(raw: any) {
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export async function login(email: string, password: string) {
-  const res = await fetch(`${API_URL}/auth/login`, {
+  const res = await fetch(`${API}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -112,7 +139,7 @@ export async function login(email: string, password: string) {
 }
 
 export async function register(name: string, email: string, password: string) {
-  const res = await fetch(`${API_URL}/auth/register`, {
+  const res = await fetch(`${API}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password }),
@@ -122,37 +149,36 @@ export async function register(name: string, email: string, password: string) {
   return data;
 }
 
-
 // ── Colloquia ─────────────────────────────────────────────────────────────────
 
 export async function getColloquium(query?: string) {
-  const res = await fetch(`${API_URL}/colloquia${query || ''}`);
+  const res = await fetch(`${API}/colloquia${query || ''}`);
   const data = await handleRes(res);
   return { ...data, data: (data.data || []).map(normColloquium) };
 }
 
 export async function getColloquiumById(id: string) {
-  const res = await fetch(`${API_URL}/colloquia/${id}`);
+  const res = await fetch(`${API}/colloquia/${id}`);
   const data = await handleRes(res);
   return { ...data, data: normColloquium(data.data) };
 }
 
-export async function createColloquium(formData: FormData) {
-  const res = await fetch(`${API_URL}/colloquia`, {
-    method: 'POST', headers: authHeaders(), body: formData,
+export async function createColloquium(body: object) {
+  const res = await fetch(`${API}/colloquia`, {
+    method: 'POST', headers: jsonHeaders(), body: JSON.stringify(body),
   });
   return handleRes(res);
 }
 
-export async function updateColloquium(id: string, formData: FormData) {
-  const res = await fetch(`${API_URL}/colloquia/${id}`, {
-    method: 'PUT', headers: authHeaders(), body: formData,
+export async function updateColloquium(id: string, body: object) {
+  const res = await fetch(`${API}/colloquia/${id}`, {
+    method: 'PUT', headers: jsonHeaders(), body: JSON.stringify(body),
   });
   return handleRes(res);
 }
 
 export async function deleteColloquium(id: string) {
-  const res = await fetch(`${API_URL}/colloquia/${id}`, {
+  const res = await fetch(`${API}/colloquia/${id}`, {
     method: 'DELETE', headers: authHeaders(),
   });
   return handleRes(res);
@@ -161,51 +187,51 @@ export async function deleteColloquium(id: string) {
 // ── Lecture Series ────────────────────────────────────────────────────────────
 
 export async function getLectureSeries(query?: string) {
-  const res = await fetch(`${API_URL}/lecture-series${query || ''}`);
+  const res = await fetch(`${API}/lecture-series${query || ''}`);
   const data = await handleRes(res);
   return { ...data, data: (data.data || []).map(normLectureSeries) };
 }
 
 export async function getLectureSeriesById(id: string) {
-  const res = await fetch(`${API_URL}/lecture-series/${id}`);
+  const res = await fetch(`${API}/lecture-series/${id}`);
   const data = await handleRes(res);
   return { ...data, data: normLectureSeries(data.data) };
 }
 
-export async function createLectureSeries(formData: FormData) {
-  const res = await fetch(`${API_URL}/lecture-series`, {
-    method: 'POST', headers: authHeaders(), body: formData,
+export async function createLectureSeries(body: object) {
+  const res = await fetch(`${API}/lecture-series`, {
+    method: 'POST', headers: jsonHeaders(), body: JSON.stringify(body),
   });
   return handleRes(res);
 }
 
-export async function updateLectureSeries(id: string, formData: FormData) {
-  const res = await fetch(`${API_URL}/lecture-series/${id}`, {
-    method: 'PUT', headers: authHeaders(), body: formData,
+export async function updateLectureSeries(id: string, body: object) {
+  const res = await fetch(`${API}/lecture-series/${id}`, {
+    method: 'PUT', headers: jsonHeaders(), body: JSON.stringify(body),
   });
   return handleRes(res);
 }
 
 export async function deleteLectureSeries(id: string) {
-  const res = await fetch(`${API_URL}/lecture-series/${id}`, {
+  const res = await fetch(`${API}/lecture-series/${id}`, {
     method: 'DELETE', headers: authHeaders(),
   });
   return handleRes(res);
 }
 
 export async function addLectureSeriesSupplement(id: string, payload: object) {
-  const res = await fetch(`${API_URL}/lecture-series/${id}/suppliments`, {
+  const res = await fetch(`${API}/lecture-series/${id}/suppliments`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    headers: jsonHeaders(),
     body: JSON.stringify(payload),
   });
   return handleRes(res);
 }
 
 export async function removeLectureSeriesSupplement(id: string, url: string) {
-  const res = await fetch(`${API_URL}/lecture-series/${id}/suppliments`, {
+  const res = await fetch(`${API}/lecture-series/${id}/suppliments`, {
     method: 'DELETE',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    headers: jsonHeaders(),
     body: JSON.stringify({ url }),
   });
   return handleRes(res);
@@ -214,33 +240,32 @@ export async function removeLectureSeriesSupplement(id: string, url: string) {
 // ── Team ──────────────────────────────────────────────────────────────────────
 
 export async function getTeam(query?: string) {
-  const res = await fetch(`${API_URL}/team${query || ''}`);
+  const res = await fetch(`${API}/team${query || ''}`);
   return handleRes(res);
 }
 
 export async function getTeamById(id: string) {
-  const res = await fetch(`${API_URL}/team/${id}`);
+  const res = await fetch(`${API}/team/${id}`);
   return handleRes(res);
 }
 
 export async function createTeamMember(formData: FormData) {
-  const res = await fetch(`${API_URL}/team`, {
+  const res = await fetch(`${API}/team`, {
     method: 'POST', headers: authHeaders(), body: formData,
   });
   return handleRes(res);
 }
 
 export async function updateTeamMember(id: string, formData: FormData) {
-  const res = await fetch(`${API_URL}/team/${id}`, {
+  const res = await fetch(`${API}/team/${id}`, {
     method: 'PUT', headers: authHeaders(), body: formData,
   });
   return handleRes(res);
 }
 
 export async function deleteTeamMember(id: string) {
-  const res = await fetch(`${API_URL}/team/${id}`, {
+  const res = await fetch(`${API}/team/${id}`, {
     method: 'DELETE', headers: authHeaders(),
   });
   return handleRes(res);
 }
-

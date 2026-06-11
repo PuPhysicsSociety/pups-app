@@ -34,14 +34,11 @@ export default function Footer() {
               Dept. of Physics
             </a>
             <Link href="/contact">Contact</Link>
-            <a href="mailto:contact@pups.edu">contact@pups.edu</a>
+            <a href="mailto:puphysicssociety@gmail.com">puphysicssociety@gmail.com</a>
           </div>
 
           <div className="footer-col">
-            <h5>Colloquia</h5>
-            <a href="https://www.youtube.com/watch?v=w1iAuKD-9Ks" target="_blank" rel="noopener">
-              Talk 01 — YouTube
-            </a>
+            <h5>Events and Colloquia</h5>
             <Link href="/colloquium">All Colloquia</Link>
             <Link href="/events">All Events</Link>
           </div>

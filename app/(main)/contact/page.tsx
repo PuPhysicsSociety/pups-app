@@ -18,7 +18,7 @@ export default function ContactPage() {
             </p>
             <p>
               You can email us at{' '}
-              <a href="mailto:contact@pups.edu" className="lnk">contact@pups.edu</a>.
+              <a href="mailto:puphysicssociety@gmail.com" className="lnk">puphysicssociety@gmail.com</a>.
             </p>
             <p>
               For departmental information, visit the{' '}
@@ -43,7 +43,7 @@ export default function ContactPage() {
               </div>
               <div className="ci">
                 <span className="ci-k">Email</span>
-                <span><a href="mailto:contact@pups.edu">contact@pups.edu</a></span>
+                <span><a href="mailto:puphysicssociety@gmail.com">puphysicssociety@gmail.com</a></span>
               </div>
               <div className="ci">
                 <span className="ci-k">Colloquia</span>

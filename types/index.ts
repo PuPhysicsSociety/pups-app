@@ -1,43 +1,4 @@
-export interface Event {
-  id: string;
-  name: string;
-  type: string;
-  date: string;
-  endDate?: string;
-  time?: string;
-  location?: string;
-  organizer?: string;
-  poster?: string;
-  tagline?: string;
-  description?: string;
-  audience?: string;
-  duration?: string;
-  rsvpLink?: string;
-  speakers?: string[];
-  tags?: string[];
-  resources?: { title: string; url: string; fileType?: string }[];
-  photos?: { url: string; publicId?: string }[];
-  video?: string;
-  past?: boolean;
-  featured?: boolean;
-  published?: boolean;
-  createdBy?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface TeamMember {
-  id: string;
-  name: string;
-  role: string;
-  linkedin_url?: string;
-  email?: string;
-  bio?: string;
-  photo?: string;
-  department?: string;
-  active?: boolean;
-}
-
+// Kept for backward compat with colloquium pages
 export interface Colloquium {
   id: string;
   name: string;
@@ -58,6 +19,31 @@ export interface Colloquium {
   createdAt?: string;
 }
 
+// Unified event type covering lecture_series | workshop | conference
+export interface UnifiedEvent {
+  id: string;
+  type: 'lecture_series' | 'workshop' | 'conference';
+  title: string;
+  description?: string;
+  mode: 'online' | 'offline';
+  thumbnail?: string;
+  lecturerDetails: { name: string; affiliation?: string; image?: string }[];
+  dateTime: { start?: string; end?: string; schedule?: string };
+  noOfClasses?: number;
+  regFormLink?: string;
+  toContact: { name?: string; email?: string; phone?: string; role?: string }[];
+  supplements: { url: string; name?: string; type?: string; source?: string }[];
+  pastImagesPreview: string[];
+  driveLink?: string;
+  subevent?: { title?: string; description?: string; speaker?: string }[];
+  venue?: string;
+  audience?: string;
+  duration?: string;
+  tags?: string[];
+  createdAt?: string;
+}
+
+// Keep old LectureSeries type for any remaining references
 export interface LectureSeries {
   id: string;
   title: string;
@@ -71,6 +57,18 @@ export interface LectureSeries {
   toContact: { name: string; email?: string; phone?: string; role?: string }[];
   supplements: { url: string; name?: string; type?: string; source?: string }[];
   createdAt?: string;
+}
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  linkedin_url?: string;
+  email?: string;
+  bio?: string;
+  photo?: string;
+  department?: string;
+  active?: boolean;
 }
 
 export interface User {

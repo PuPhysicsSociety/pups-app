@@ -1,8 +1,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getLectureSeries } from '@/lib/api';
-import { LectureSeries } from '../../../types';
+import { getEvents } from '@/lib/api';
+import { UnifiedEvent } from '../../../types';
 
 const T = {
   tx:    'var(--tx,   #1f1b16)',
@@ -14,6 +14,12 @@ const T = {
   serif: "'Cormorant Garamond', Georgia, serif",
   mono:  "'IBM Plex Mono', 'Courier New', monospace",
 } as const;
+
+const TYPE_LABELS: Record<string, string> = {
+  lecture_series: 'Lecture Series',
+  workshop:       'Workshop',
+  conference:     'Conference',
+};
 
 function fmtDay(iso?: string): string {
   if (!iso) return '';
@@ -29,20 +35,17 @@ function fmtMonthYear(iso?: string): string {
 }
 
 interface EventRowProps {
-  day: string;
-  monthYear: string;
-  title: string;
-  speaker?: string;
-  affiliation?: string;
-  description?: string;
-  time?: string;
-  venue?: string;
-  tag: string;
+  event: UnifiedEvent;
   onClick?: () => void;
 }
 
-function EventRow({ day, monthYear, title, speaker, affiliation, description, time, venue, tag, onClick }: EventRowProps) {
+function EventRow({ event, onClick }: EventRowProps) {
   const [hovered, setHovered] = React.useState(false);
+  const firstLecturer = event.lecturerDetails?.[0];
+  const day       = fmtDay(event.dateTime?.start);
+  const monthYear = fmtMonthYear(event.dateTime?.start);
+  const tag       = TYPE_LABELS[event.type] || event.type;
+
   return (
     <article
       onClick={onClick}
@@ -62,84 +65,64 @@ function EventRow({ day, monthYear, title, speaker, affiliation, description, ti
     >
       {/* Date column */}
       <div style={{ paddingTop: 2 }}>
-        <b style={{
-          display: 'block',
-          fontFamily: T.serif,
-          fontSize: 42,
-          fontWeight: 300,
-          lineHeight: 1,
-          letterSpacing: '-0.02em',
-          color: T.tx,
-        }}>
-          {day}
-        </b>
+        {day && (
+          <b style={{
+            display: 'block', fontFamily: T.serif, fontSize: 42,
+            fontWeight: 300, lineHeight: 1, letterSpacing: '-0.02em', color: T.tx,
+          }}>
+            {day}
+          </b>
+        )}
         <div style={{
-          fontFamily: T.mono,
-          fontSize: 10,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: T.tx3,
-          lineHeight: 1.8,
-          marginTop: 4,
+          fontFamily: T.mono, fontSize: 10, letterSpacing: '0.14em',
+          textTransform: 'uppercase', color: T.tx3, lineHeight: 1.8, marginTop: 4,
         }}>
-          {monthYear}
+          {monthYear || (event.dateTime?.schedule ? '' : '—')}
         </div>
       </div>
 
       {/* Content column */}
       <div style={{ minWidth: 0 }}>
         <h3 style={{
-          fontFamily: T.serif,
-          fontSize: 24,
-          fontWeight: 400,
-          lineHeight: 1.18,
-          letterSpacing: '-0.01em',
-          color: T.tx,
-          marginBottom: 10,
+          fontFamily: T.serif, fontSize: 24, fontWeight: 400,
+          lineHeight: 1.18, letterSpacing: '-0.01em', color: T.tx, marginBottom: 10,
         }}>
-          {title}
+          {event.title}
         </h3>
 
-        {speaker && (
+        {firstLecturer && (
           <p style={{
-            fontFamily: T.mono,
-            fontSize: 10.5,
-            letterSpacing: '0.04em',
-            color: T.tx3,
-            lineHeight: 1.75,
-            marginBottom: description ? 10 : 0,
+            fontFamily: T.mono, fontSize: 10.5, letterSpacing: '0.04em',
+            color: T.tx3, lineHeight: 1.75, marginBottom: event.description ? 10 : 0,
           }}>
-            <span style={{ color: T.tx2, fontWeight: 500 }}>{speaker}</span>
-            {affiliation && <span style={{ color: T.tx4 }}> · {affiliation}</span>}
+            <span style={{ color: T.tx2, fontWeight: 500 }}>{firstLecturer.name}</span>
+            {firstLecturer.affiliation && (
+              <span style={{ color: T.tx4 }}> · {firstLecturer.affiliation}</span>
+            )}
           </p>
         )}
 
-        {description && (
+        {event.description && (
           <p style={{
-            fontFamily: T.mono,
-            fontSize: 11.5,
-            lineHeight: 1.75,
-            color: T.tx3,
+            fontFamily: T.mono, fontSize: 11.5, lineHeight: 1.75, color: T.tx3,
             marginBottom: 12,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical' as const,
-            overflow: 'hidden',
+            display: '-webkit-box', WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical' as const, overflow: 'hidden',
           }}>
-            {description}
+            {event.description}
           </p>
         )}
 
-        {(time || venue) && (
+        {(event.dateTime?.schedule || event.venue || event.mode === 'online') && (
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' as const }}>
-            {time && (
+            {event.dateTime?.schedule && (
               <span style={{ fontFamily: T.mono, fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: T.tx4 }}>
-                <span style={{ color: T.cr, marginRight: 6 }}>◦</span>{time}
+                <span style={{ color: T.cr, marginRight: 6 }}>◦</span>{event.dateTime.schedule}
               </span>
             )}
-            {venue && (
+            {(event.venue || event.mode === 'online') && (
               <span style={{ fontFamily: T.mono, fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: T.tx4 }}>
-                {venue}
+                {event.venue || 'Online'}
               </span>
             )}
           </div>
@@ -149,14 +132,10 @@ function EventRow({ day, monthYear, title, speaker, affiliation, description, ti
       {/* Tag column */}
       <div style={{ paddingTop: 4 }}>
         <span style={{
-          fontFamily: T.mono,
-          fontSize: 9,
-          letterSpacing: '0.18em',
+          fontFamily: T.mono, fontSize: 9, letterSpacing: '0.18em',
           textTransform: 'uppercase' as const,
-          border: `1px solid ${T.rule}`,
-          color: T.tx3,
-          padding: '5px 10px',
-          whiteSpace: 'nowrap' as const,
+          border: `1px solid ${T.rule}`, color: T.tx3,
+          padding: '5px 10px', whiteSpace: 'nowrap' as const,
         }}>
           {tag}
         </span>
@@ -167,13 +146,13 @@ function EventRow({ day, monthYear, title, speaker, affiliation, description, ti
 
 export default function EventsPage() {
   const router = useRouter();
-  const [series, setSeries] = useState<LectureSeries[]>([]);
+  const [events,  setEvents]  = useState<UnifiedEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error,   setError]   = useState('');
 
   useEffect(() => {
-    getLectureSeries()
-      .then(data => setSeries(data.data || []))
+    getEvents()
+      .then(data => setEvents(data.data || []))
       .catch(() => setError('Could not load events.'))
       .finally(() => setLoading(false));
   }, []);
@@ -194,31 +173,19 @@ export default function EventsPage() {
         {error && (
           <div style={{ padding: '40px 0', color: '#8c1c1c', fontSize: 12 }}>{error}</div>
         )}
-        {!loading && !error && series.length === 0 && (
+        {!loading && !error && events.length === 0 && (
           <div style={{ padding: '40px 0', color: 'var(--tx4)', fontSize: 12 }}>No events available yet.</div>
         )}
 
-        {!loading && !error && series.length > 0 && (
+        {!loading && !error && events.length > 0 && (
           <div>
-            {series.map(ls => {
-              const firstLecturer = ls.lecturerDetails?.[0];
-              return (
-                <EventRow
-                  key={ls.id}
-                  day={fmtDay(ls.dateTime?.start)}
-                  monthYear={fmtMonthYear(ls.dateTime?.start)}
-                  title={ls.title}
-                  speaker={firstLecturer?.name}
-                  affiliation={firstLecturer?.affiliation}
-                  description={ls.description}
-                  time={ls.dateTime?.schedule}
-                  venue={ls.mode === 'online' ? 'Online' : undefined}
-                  tag="Lecture Series"
-                  onClick={() => router.push(`/lecture-series/${ls.id}`)}
-                />
-              );
-            })}
-            {/* Workshop rows will slot in here once /api/workshop is ready */}
+            {events.map(ev => (
+              <EventRow
+                key={ev.id}
+                event={ev}
+                onClick={() => router.push(`/events/${ev.id}`)}
+              />
+            ))}
           </div>
         )}
       </div>

@@ -23,7 +23,12 @@ export default function Header() {
     <>
       <nav className="site-nav">
         <Link href="/" className="nav-logo">
-          <img src="/logo.png" alt="PUPS" onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+          {/* FIX: was /logo.png — file lives at /public/placeholders/logo.png */}
+          <img
+            src="/placeholders/logo.png"
+            alt="PUPS"
+            onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+          />
           <span className="nav-wm"><b>PUPS</b> Presidency University Physics Society</span>
         </Link>
 

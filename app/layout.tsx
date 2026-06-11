@@ -3,6 +3,7 @@ import React from 'react';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import { AuthProvider } from '../context/AuthContext';
+import IntroOverlay from '../components/IntroOverlay';
 
 export const metadata = {
   title: 'PUPS — Presidency University Physics Society',
@@ -14,6 +15,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <AuthProvider>
+          {/* Intro overlay — only on first visit per session */}
+          <IntroOverlay />
           <Header />
           <main style={{ flex: 1 }}>
             {children}

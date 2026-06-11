@@ -237,6 +237,114 @@ export async function removeLectureSeriesSupplement(id: string, url: string) {
   return handleRes(res);
 }
 
+// ── Events ──────────────────────────────────────────────────────────────────────
+
+export function normEvent(raw: any) {
+  return {
+    id:                  raw._id || raw.id || '',
+    type:                raw.type || 'lecture_series',
+    title:               raw.title || '',
+    description:         raw.description || '',
+    mode:                raw.mode || 'offline',
+    thumbnail:           raw.thumbnail || '',
+    lecturerDetails:     raw.lecturer_details || [],
+    dateTime:            raw.date_time || {},
+    noOfClasses:         raw.no_of_classes,
+    regFormLink:         raw.reg_form_link || '',
+    toContact:           raw.to_contact || [],
+    supplements:         raw.suppliments || [],
+    pastImagesPreview:   raw.past_images_preview || [],
+    driveLink:           raw.drive_link || '',
+    subevent:            raw.subevent || [],
+    venue:               raw.venue || '',
+    audience:            raw.audience || '',
+    duration:            raw.duration || '',
+    tags:                raw.tags || [],
+    createdAt:           raw.createdAt || '',
+  };
+}
+
+export async function getEvents(query?: string) {
+  const res = await fetch(`${API}/events${query || ''}`);
+  const data = await handleRes(res);
+  return { ...data, data: (data.data || []).map(normEvent) };
+}
+
+export async function getEventById(id: string) {
+  const res = await fetch(`${API}/events/${id}`);
+  const data = await handleRes(res);
+  return { ...data, data: normEvent(data.data) };
+}
+
+export async function createEvent(body: object) {
+  const res = await fetch(`${API}/events`, {
+    method: 'POST', headers: jsonHeaders(), body: JSON.stringify(body),
+  });
+  return handleRes(res);
+}
+
+export async function updateEvent(id: string, body: object) {
+  const res = await fetch(`${API}/events/${id}`, {
+    method: 'PUT', headers: jsonHeaders(), body: JSON.stringify(body),
+  });
+  return handleRes(res);
+}
+
+export async function deleteEvent(id: string) {
+  const res = await fetch(`${API}/events/${id}`, {
+    method: 'DELETE', headers: authHeaders(),
+  });
+  return handleRes(res);
+}
+
+export async function addEventSupplement(id: string, payload: object) {
+  const res = await fetch(`${API}/events/${id}/suppliments`, {
+    method: 'POST', headers: jsonHeaders(), body: JSON.stringify(payload),
+  });
+  return handleRes(res);
+}
+
+export async function removeEventSupplement(id: string, url: string) {
+  const res = await fetch(`${API}/events/${id}/suppliments`, {
+    method: 'DELETE', headers: jsonHeaders(), body: JSON.stringify({ url }),
+  });
+  return handleRes(res);
+}
+
+// Also export uploadToCloudinaryRaw for non-image files (PDFs etc.)
+export async function uploadFileToCloudinary(file: File, folder: string): Promise<{ url: string; name: string; type: string }> {
+  const isImage = file.type.startsWith('image/');
+  const resource_type = isImage ? 'image' : 'raw';
+
+  const signRes = await fetch(`${API}/cloudinary/sign`, {
+    method: 'POST',
+    headers: jsonHeaders(),
+    body: JSON.stringify({ folder, resource_type }),
+  });
+  if (!signRes.ok) throw new Error('Could not get upload signature');
+  const { signature, timestamp, cloudName, apiKey, folder: f } = await signRes.json();
+
+  const form = new FormData();
+  form.append('file', file);
+  form.append('api_key', apiKey);
+  form.append('timestamp', String(timestamp));
+  form.append('signature', signature);
+  form.append('folder', f);
+
+  const uploadRes = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloudName}/${resource_type}/upload`,
+    { method: 'POST', body: form }
+  );
+  if (!uploadRes.ok) throw new Error('Cloudinary upload failed');
+  const result = await uploadRes.json();
+  return {
+    url:  result.secure_url as string,
+    name: file.name,
+    type: file.type,
+  };
+}
+
+
 // ── Team ──────────────────────────────────────────────────────────────────────
 
 export async function getTeam(query?: string) {

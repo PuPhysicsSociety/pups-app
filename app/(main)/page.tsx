@@ -1,29 +1,24 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getLectureSeries, getColloquium } from '@/lib/api';
+import { getEvents, getColloquium } from '@/lib/api';
 import EquationStrip from '@/components/ui/EquationStrip';
 
-function parseDateParts(dateStr: string) {
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return { day: dateStr, mon: '' };
-  return {
-    day: d.getDate().toString(),
-    mon: d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }),
-  };
-}
-
 export default function Home() {
-  const [series, setSeries] = useState<any[]>([]);
-  const [colloquia, setColloquia] = useState<any[]>([]);
+  const [latestEvent, setLatestEvent] = useState<any>(null);
+  const [latestColl, setLatestColl]   = useState<any>(null);
 
   useEffect(() => {
-    getLectureSeries().then(d => setSeries(d.data || [])).catch(() => {});
-    getColloquium().then(d => setColloquia(d.data || [])).catch(() => {});
-  }, []);
+    getEvents().then(d => {
+      const items = d.data || [];
+      if (items.length > 0) setLatestEvent(items[0]);
+    }).catch(() => {});
 
-  const latestEvent = series[0];
-  const latestColl = colloquia[0];
+    getColloquium().then(d => {
+      const items = d.data || [];
+      if (items.length > 0) setLatestColl(items[0]);
+    }).catch(() => {});
+  }, []);
 
   return (
     <>
@@ -49,38 +44,47 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="home-aside">
-              <Link href="/events" className="aside-item">
-                <div className="aside-lbl">Latest Event</div>
-                <div className="aside-title">
-                  <em className="aside-arr">→</em>
-                  {latestEvent ? latestEvent.title : 'Annual National Conference'}
-                </div>
-                <div className="aside-meta">
-                  {latestEvent ? `${latestEvent.mode}${latestEvent.dateTime?.schedule ? ' · ' + latestEvent.dateTime.schedule : ''}` : 'Baker Building'}
-                </div>
-              </Link>
+            {/* FIX: Only render aside-items when data actually exists */}
+            {(latestEvent || latestColl) && (
+              <div className="home-aside">
+                {latestEvent && (
+                  <Link href="/events" className="aside-item">
+                    <div className="aside-lbl">Latest Event</div>
+                    <div className="aside-title">
+                      <em className="aside-arr">→</em>
+                      {latestEvent.title}
+                    </div>
+                    <div className="aside-meta">
+                      {latestEvent.mode}
+                      {latestEvent.dateTime?.schedule ? ` · ${latestEvent.dateTime.schedule}` : ''}
+                    </div>
+                  </Link>
+                )}
 
-              <Link href="/colloquium" className="aside-item">
-                <div className="aside-lbl">Latest Colloquium</div>
-                <div className="aside-title">
-                  <em className="aside-arr">→</em>
-                  {latestColl ? latestColl.name : 'Gravitational Wave Detection using PSO'}
-                </div>
-                <div className="aside-meta">
-                  {latestColl ? `${latestColl.date}${latestColl.speaker ? ' · ' + latestColl.speaker : ''}` : 'Aritra Bakshi'}
-                </div>
-              </Link>
+                {latestColl && (
+                  <Link href="/colloquium" className="aside-item">
+                    <div className="aside-lbl">Latest Colloquium</div>
+                    <div className="aside-title">
+                      <em className="aside-arr">→</em>
+                      {latestColl.name}
+                    </div>
+                    <div className="aside-meta">
+                      {latestColl.date}
+                      {latestColl.speaker ? ` · ${latestColl.speaker}` : ''}
+                    </div>
+                  </Link>
+                )}
 
-              <Link href="/team" className="aside-item">
-                <div className="aside-lbl">Society</div>
-                <div className="aside-title">
-                  <em className="aside-arr">→</em>
-                  Meet the people behind PUPS
-                </div>
-                <div className="aside-meta">Exec committee · PhD scholars · Members</div>
-              </Link>
-            </div>
+                <Link href="/team" className="aside-item">
+                  <div className="aside-lbl">Society</div>
+                  <div className="aside-title">
+                    <em className="aside-arr">→</em>
+                    Meet the people behind PUPS
+                  </div>
+                  <div className="aside-meta">Exec committee · PhD scholars · Members</div>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -119,8 +123,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Recent events */}
-      {series.length > 0 && (
+      {/* Recent events — only shown when data exists */}
+      {latestEvent && (
         <section className="section">
           <div className="wrap">
             <div className="sec-head">
@@ -128,19 +132,23 @@ export default function Home() {
               <h2 className="sec-title">Recent &amp; upcoming <em>events</em>.</h2>
             </div>
             <div className="ls-grid">
-              {series.slice(0, 4).map((ls: any) => (
-                <Link key={ls.id} href={`/lecture-series/${ls.id}`} className="ls-card">
-                  <div className="ls-mode">{ls.mode}</div>
-                  <div className="ls-card-title">{ls.title}</div>
-                  {ls.lecturerDetails?.length > 0 && (
-                    <div className="ls-card-meta">{ls.lecturerDetails.map((l: any) => l.name).join(', ')}</div>
-                  )}
-                  {ls.description && <div className="ls-card-desc">{ls.description}</div>}
-                  {ls.dateTime?.schedule && (
-                    <div className="ls-card-meta" style={{ marginTop: 10 }}>{ls.dateTime.schedule}</div>
-                  )}
-                </Link>
-              ))}
+              <Link href={`/events/${latestEvent.id}`} className="ls-card">
+                <div className="ls-mode">{latestEvent.type?.replace('_', ' ') || latestEvent.mode}</div>
+                <div className="ls-card-title">{latestEvent.title}</div>
+                {latestEvent.lecturerDetails?.length > 0 && (
+                  <div className="ls-card-meta">
+                    {latestEvent.lecturerDetails.map((l: any) => l.name).join(', ')}
+                  </div>
+                )}
+                {latestEvent.description && (
+                  <div className="ls-card-desc">{latestEvent.description}</div>
+                )}
+                {latestEvent.dateTime?.schedule && (
+                  <div className="ls-card-meta" style={{ marginTop: 10 }}>
+                    {latestEvent.dateTime.schedule}
+                  </div>
+                )}
+              </Link>
             </div>
             <div style={{ marginTop: 32 }}>
               <Link href="/events" className="btn">View all events</Link>

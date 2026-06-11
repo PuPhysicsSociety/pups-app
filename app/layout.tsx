@@ -4,7 +4,9 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import { AuthProvider } from '../context/AuthContext';
 import IntroOverlay from '../components/IntroOverlay';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
+
 
 export const metadata = {
   title: 'PUPS — Presidency University Physics Society',
@@ -27,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </main>
           <Footer />
         </AuthProvider>
+        <SpeedInsights />
         <Analytics />
       </body>
     </html>

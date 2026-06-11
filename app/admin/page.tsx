@@ -268,7 +268,7 @@ function TeamPanel() {
     <div>
       <div className="adm-sec-head">
         <div className="adm-h">Team</div>
-        <button className={`adm-btn ${open && !editId ? 'ghost' : ''}`} onClick={() => { reset(); setOpen(o => !o); }}>
+        <button disabled={true} className={`adm-btn ${open && !editId ? 'ghost' : ''}`} onClick={() => { reset(); setOpen(o => !o); }}>
           {open && !editId ? '✕ Cancel' : '+ Add Member'}
         </button>
       </div>

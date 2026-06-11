@@ -342,7 +342,8 @@ site-footer { background: var(--s2); padding: 48px 0 32px; border-top: 1px solid
   .nav-hamburger { display: flex; }
   .nav-wm { font-size: 9px; letter-spacing: .14em; }
   .wrap { padding: 0 20px; }
-  .home-hero { grid-template-columns: 1fr; gap: 28px; padding: 40px 0 32px; }
+  .section { padding: 40px 0; }
+  .home-hero { grid-template-columns: 1fr; gap: 28px; padding: 0 0 24px; }
   .home-h1 { font-size: clamp(34px,9vw,52px); }
   .eq-track span { font-size: 15px; padding: 0 16px; }
   .pillars { grid-template-columns: 1fr 1fr; }

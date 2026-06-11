@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function ContactPage() {
   return (
-    <section className="section cream">
+    <section className="section">
       <div className="wrap">
         <div className="sec-head">
           <div className="sec-label"><b>vi</b>Contact</div>

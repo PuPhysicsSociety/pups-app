@@ -88,3 +88,5 @@ export interface User {
     canAccessAnalytics: boolean;
   };
 }
+// Backward compat alias — EventCard.tsx imports this
+export type Event = UnifiedEvent;

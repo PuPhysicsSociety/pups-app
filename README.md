@@ -1,111 +1,242 @@
-# PUPS Site (Next.js App Router, TypeScript)
+# PUPS Site (Next.js App Router, TypeScript, MongoDB)
 
-A scaffolded frontend for the PUPS Site based on the provided flowchart.
-Built with Next.js App Router and TypeScript, this project provides simple, local-data-driven pages for events, colloquium entries, and the team. 
+A full-stack events management platform for the Physics Society. Built with Next.js App Router, TypeScript, and MongoDB, with Cloudinary for media storage and JWT authentication for admin access.
+
+## Features
+
+- **Event Management**: Create, read, update, delete events (lecture series, workshops, conferences)
+- **Colloquium Management**: Manage colloquium entries with speakers and abstracts
+- **Team Pages**: Display team members with roles and details
+- **Admin API**: Protected endpoints for managing events, colloquia, and team data
+- **File Uploads**: Direct-to-Cloudinary uploads with signed signatures
+- **TypeScript**: Full type safety across frontend and backend
 
 ## Routes
-- /                        (Landing page)
-- /about                   (About page)
-- /events                  (Events listing)
-- /events/panel-discussion (Panel discussions listing)
-- /events/[id]             (Event detail)
-- /colloquium              (Colloquium listing)
-- /colloquium/[id]         (Colloquium detail)
-- /team                    (Team listing)
-- /team/[id]               (Team member detail)
 
-## Quick start
+### Public Pages
+- `/` — Landing page
+- `/about` — About page
+- `/events` — Events listing
+- `/events/[id]` — Event detail page
+- `/colloquium` — Colloquium listing
+- `/colloquium/[id]` — Colloquium detail page
+- `/team` — Team listing
+- `/team/[id]` — Team member detail page
 
-1. Clone the repo
+### Admin API Routes (Protected with JWT)
+- `POST /api/auth/login` — Admin login
+- `POST /api/cloudinary/sign` — Get signed upload signature
+- `GET/POST/PUT/DELETE /api/events` — Event CRUD
+- `GET/POST/PUT/DELETE /api/colloquia` — Colloquium CRUD
+- `GET/POST/PUT/DELETE /api/team` — Team CRUD
+- `POST /api/admin/migrate` — One-time data migration (LectureSeries/Workshop → Event)
+
+## Quick Start
+
+### 1. Clone the repo
 ```bash
-git clone https://github.com/AritraBakshi/pups_front.git
-cd pups_front
+git clone https://github.com/PuPhysicsSociety/pups-app.git
+cd pups-app
 ```
 
-2. Install dependencies
+### 2. Install dependencies
 ```bash
 npm install
-# or
-yarn
 ```
 
-3. Run the development server
+### 3. Set up environment variables
+
+Create a `.env.local` file in the project root:
+
+```env
+# MongoDB
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/pups_db
+
+# JWT Authentication
+JWT_SECRET=your_super_secret_jwt_key_here_minimum_32_chars
+JWT_EXPIRES_IN=7d
+
+# Admin credentials
+ADMIN_EMAIL=admin@pups.com
+ADMIN_PASSWORD_HASH=$2b$10$... # bcrypt hash of your password
+
+# Cloudinary (for image uploads)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+> **Important**: Get your MongoDB connection string from [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). The `ADMIN_PASSWORD_HASH` should be a bcrypt hash—generate one using an online tool or the Node.js `bcryptjs` library.
+
+### 4. Run the development server
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
-4. Open http://localhost:3000
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-Default dev port: 3000 (Next.js will print the actual port if different).
+## Development Scripts
 
-## Notes / Project details
-
-- Framework: Next.js (App Router)
-- Language: TypeScript
-- Styling: Simple CSS (styles/globals.css)
-- Data source: Local JSON files in /data
-  - data/events.json
-  - data/colloquium.json
-  - data/team.json
-- Placeholder images: put placeholder images into /public/placeholders/
-  - See public/placeholders/readme.txt for filenames and guidance.
-
-## Development scripts (typical)
-Adjust to match package.json if different.
-
-- npm run dev — start dev server
-- npm run build — create production build
-- npm run start — start production server (after build)
-- npm run lint — run linters
-- npm run format — format code
-- npm run test — run tests
-
-Example:
 ```bash
-npm run dev
-npm run build
-npm run start
+npm run dev      # Start dev server (with hot reload)
+npm run build    # Create production build
+npm run start    # Start production server
+npm run lint     # Run linters
+npm run format   # Format code with Prettier
+npm run test     # Run tests (if configured)
 ```
 
-## Recommended environment
-- Node.js 18+ (or the version configured in your project)
-- npm 8+ or Yarn
+## Project Structure
 
-## Project structure (high level)
-- /app                — Next.js App Router pages and layout
-- /components         — Reusable UI components
-- /data               — Local JSON data (events.json, colloquium.json, team.json)
-- /public/placeholders — Placeholder images used by the scaffold
-- /styles             — globals.css and other styles
-- next.config.js
-- package.json
-- tsconfig.json
+```
+pups-app/
+├── app/                        # Next.js App Router
+│   ├── api/                    # API routes (backend)
+│   │   ├── auth/
+│   │   ├── cloudinary/
+│   │   ├── events/
+│   │   ├── colloquia/
+│   │   ├── team/
+│   │   └── admin/migrate/
+│   ├── page.tsx                # Landing page
+│   ├── about/                  # About page
+│   ├── events/                 # Events pages
+│   ├── colloquium/             # Colloquium pages
+│   ├── team/                   # Team pages
+│   └── layout.tsx              # Root layout
+├── components/                 # Reusable UI components
+│   ├── ui/                     # Basic UI components
+│   └── ...
+├── lib/                        # Shared utilities
+│   ├── api.ts                  # API client helpers
+│   ├── auth.ts                 # JWT verification
+│   ├── db.ts                   # MongoDB connection (cached)
+│   ├── cloudinary.ts           # Cloudinary config
+│   └── models/                 # Mongoose schemas
+│       ├── Event.ts
+│       ├── Colloquium.ts
+│       ├── LectureSeries.ts
+│       ├── Workshop.ts
+│       └── TeamMember.ts
+├── types/                      # TypeScript type definitions
+│   └── index.ts
+├── styles/                     # Global styles
+├── public/                     # Static assets
+│   └── placeholders/           # Placeholder images
+├── .env.local                  # Environment variables (not in git)
+├── next.config.js              # Next.js configuration
+├── tsconfig.json               # TypeScript config
+└── package.json
+```
 
-## Adding or updating data
-Edit the JSON files in /data. The app reads from these local files; no backend is required for the scaffold.
+## Tech Stack
 
-## Images / placeholders
-Place image files in /public/placeholders/ and reference them in the JSON records by filename/path. See public/placeholders/readme.txt for required placeholder names.
+- **Framework**: Next.js 16+ (App Router)
+- **Language**: TypeScript
+- **Database**: MongoDB with Mongoose
+- **Styling**: Tailwind CSS
+- **Authentication**: JWT (jsonwebtoken)
+- **Password Hashing**: bcryptjs
+- **File Storage**: Cloudinary
+- **Runtime**: Node.js (Vercel Functions)
 
-## Tests
-If you add tests, include instructions here for running unit/e2e tests and any test setup.
+## Environment Variables Reference
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `MONGODB_URI` | MongoDB connection string | `mongodb+srv://user:pass@cluster.mongodb.net/db` |
+| `JWT_SECRET` | Secret key for signing JWT tokens | Any random 32+ char string |
+| `JWT_EXPIRES_IN` | JWT token expiration time | `7d`, `24h` |
+| `ADMIN_EMAIL` | Admin account email | `admin@pups.com` |
+| `ADMIN_PASSWORD_HASH` | bcrypt hash of admin password | `$2b$10$...` |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | From Cloudinary dashboard |
+| `CLOUDINARY_API_KEY` | Cloudinary API key | From Cloudinary dashboard |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret | From Cloudinary dashboard |
+
+## File Upload Flow
+
+1. **Admin requests upload signature**: `POST /api/cloudinary/sign` with JWT token
+2. **Server responds with signed parameters**: Valid for 60 seconds
+3. **Frontend uploads directly to Cloudinary**: Bypasses Vercel's 4.5 MB limit
+4. **Cloudinary returns secure URL**: Frontend includes URL in create/update request
+5. **API saves URL to MongoDB**: Event/Colloquium/Team document stores Cloudinary URL
+
+This approach avoids Vercel's request body size limit.
+
+## Admin Authentication Example
+
+```bash
+# 1. Login to get JWT token
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@pups.com","password":"your_password"}'
+
+# Response:
+# {"success":true,"token":"eyJhbGc..."}
+
+# 2. Use token for protected endpoints
+curl -X GET http://localhost:3000/api/events \
+  -H "Authorization: Bearer eyJhbGc..."
+```
 
 ## Deployment
-Build the app and deploy to Vercel, Netlify, or any Node-capable host.
 
-Build:
+### Vercel (Recommended)
+
+1. Push code to GitHub
+2. Import repository in [Vercel Dashboard](https://vercel.com/dashboard)
+3. Add environment variables in Project Settings → Environment Variables
+4. Deploy
+
 ```bash
 npm run build
 npm run start
 ```
 
-## Contributing
-Contributions welcome. Typical workflow:
-1. Fork the repo
-2. Create a branch: git checkout -b feature/your-feature
-3. Commit changes: git commit -m "Add feature"
-4. Push and open a PR
+### Other Platforms
 
-Add any repo-specific contribution guidelines or PR templates here.
+Works on any Node.js 18+ host (AWS Lambda, Railway, Render, etc.).
+
+## Database Schema
+
+### Event
+```typescript
+{
+  type: 'lecture_series' | 'workshop' | 'conference',
+  title: string,
+  description?: string,
+  mode: 'online' | 'offline',
+  thumbnail?: string,  // Cloudinary URL
+  lecturer_details: { name, affiliation?, image? }[],
+  date_time: { start?, end?, schedule? },
+  reg_form_link?: string,
+  to_contact: { name?, email?, phone?, role? }[],
+  suppliments: { url, name?, type?, source? }[],
+  // ... more fields
+}
+```
+
+See `/lib/models/Event.ts` for full schema.
+
+## Important Notes
+
+- **Mongoose Caching**: MongoDB connections are cached in `lib/db.ts` to avoid exhausting the connection pool on serverless.
+- **Type-Safe Imports**: Use `import type { Event }` for TypeScript types to avoid runtime issues.
+- **Spelling**: Field name `suppliments` is intentionally misspelled to match legacy database—don't change without migration.
+- **Next.js 15+**: Dynamic route `params` are Promises; always `await params` before accessing.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit changes: `git commit -m "Add feature"`
+4. Push to branch: `git push origin feature/your-feature`
+5. Open a Pull Request
+
+## License
+
+[Add your license here]
+
+## Support
+
+For issues or questions, open a GitHub issue or contact the PUPS team.

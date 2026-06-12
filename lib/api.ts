@@ -335,7 +335,10 @@ export async function uploadFileToCloudinary(file: File, folder: string): Promis
     `https://api.cloudinary.com/v1_1/${cloudName}/${resource_type}/upload`,
     { method: 'POST', body: form }
   );
-  if (!uploadRes.ok) throw new Error('Cloudinary upload failed');
+  if (!uploadRes.ok) {
+    console.error('Cloudinary upload failed', await uploadRes.text());
+    throw new Error('Cloudinary upload failed');
+  }
   const result = await uploadRes.json();
   return {
     url:  result.secure_url as string,

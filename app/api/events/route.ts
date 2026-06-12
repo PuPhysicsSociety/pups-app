@@ -9,7 +9,7 @@ export async function GET() {
   console.log('[API EVENTS GET] Fetching all events');
   try {
     await dbReady;
-    const items = await Event.find().sort({ createdAt: -1 });
+    const items = await Event.find().sort({ 'date_time.start': -1 });
     console.log(`[API EVENTS GET] Successfully retrieved ${items.length} events`);
     return NextResponse.json({ success: true, data: items });
   } catch (err: unknown) {

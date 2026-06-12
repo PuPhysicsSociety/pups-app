@@ -76,11 +76,11 @@ export default function ResearchInterestsCloud() {
       <svg
         viewBox={`0 0 ${width} ${height}`}
         width="100%"
-        maxWidth="600px"
         style={{
+          maxWidth: "600px",
           border: `1px solid rgba(26,23,16,.13)`,
           background: '#f5efe0',
-          borderRadius: '2px',
+          borderRadius: '8px', // Added since your error message implies borderRadius exists
         }}
       >
         {/* Background accent */}

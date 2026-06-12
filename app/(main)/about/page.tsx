@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import React from 'react';
-import ResearchInterestsCloud from '@/components/ui/ResearchInterestsCloud'; // 1. Import the cloud
 
 export const metadata: Metadata = {
   title: 'About Us | Presidency University Physics Society',
@@ -14,10 +13,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      {/* 2. Insert the fixed watermark layer at the root level */}
-      <ResearchInterestsCloud />
-
-      <section className="section" style={{ position: 'relative', zIndex: 1 }}>
+      <section className="section">
         <div className="wrap">
           <div className="sec-head">
             <div className="sec-label"><b>ii</b>About</div>

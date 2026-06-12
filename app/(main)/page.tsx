@@ -101,7 +101,7 @@ export default function Home() {
           <div className="pillars">
             <div className="pillar">
               <div className="pillar-num">01</div>
-              <h3>Student Discussion Forum</h3>
+              <h3>Scientific Discussion Forum</h3>
               <p>Expert talks on cutting-edge physics research, open to all students and faculty each week.</p>
             </div>
             <div className="pillar">

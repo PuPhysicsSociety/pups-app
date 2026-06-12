@@ -21,7 +21,7 @@ export default function ColloquiumPage() {
       <div className="wrap">
         <div className="sec-head">
           <div className="sec-label"><b>iv</b>Colloquium</div>
-          <h2 className="sec-title">Students' Discussion <em>Forum</em>.</h2>
+          <h2 className="sec-title">Scientific Discussion <em>Forum</em>.</h2>
         </div>
 
         {loading && (

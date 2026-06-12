@@ -69,13 +69,13 @@ export default function ColloquiumDetail() {
 
         <div style={{ marginTop: 36 }}>
           <div className="detail-abs-label">Abstract</div>
-          <p className="detail-abstract">{entry.abstract}</p>
+          <p className="detail-abstract" style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>{entry.abstract}</p>
         </div>
 
         {entry.speakerBio && (
           <div style={{ marginTop: 36 }}>
             <div className="detail-abs-label">About the Speaker</div>
-            <p className="detail-abstract" style={{ fontSize: 16 }}>{entry.speakerBio}</p>
+            <p className="detail-abstract" style={{ fontSize: 16, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>{entry.speakerBio}</p>
           </div>
         )}
 

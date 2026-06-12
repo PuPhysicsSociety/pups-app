@@ -71,7 +71,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ── Image Carousel ─────────────────────────────────────────────────────────────
+// ── Image Carousel ─────────────────────────────────────────────────────────
 
 function ImageCarousel({ images, title }: { images: string[]; title: string }) {
   const [idx, setIdx] = useState(0);
@@ -150,7 +150,7 @@ function ImageCarousel({ images, title }: { images: string[]; title: string }) {
   );
 }
 
-// ── Main page ──────────────────────────────────────────────────────────────────
+// ── Main page ──────────────────────────────────────────────────────────
 
 export default function EventDetailPage() {
   const { id } = useParams() as { id: string };
@@ -362,6 +362,8 @@ export default function EventDetailPage() {
                   color: T.tx2,
                   marginBottom: 48,
                   maxWidth: 680,
+                  whiteSpace: 'pre-wrap',
+                  wordWrap: 'break-word',
                 }}>
                   {entry.description}
                 </p>

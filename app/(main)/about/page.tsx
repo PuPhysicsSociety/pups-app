@@ -11,7 +11,7 @@ export default function AboutPage() {
           </div>
           <div className="about-grid">
             <dl className="about-dl">
-              <dt>Founded</dt><dd>2025</dd>
+              <dt>Founded</dt><dd>November 2025</dd>
               <dt>Institution</dt><dd>Presidency University, Kolkata</dd>
               <dt>Department</dt><dd>Department of Physics</dd>
               <dt>Colloquia venue</dt><dd>PLT-2, Baker Building</dd>

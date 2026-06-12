@@ -676,7 +676,7 @@ export default function TeamPage() {
                 <b>iii</b>
                 Scholars
               </div>
-              <h2 className="team-section-title">PhD <em>scholars</em>.</h2>
+              <h2 className="team-section-title">Academic <em>committee</em>.</h2>
             </div>
             <div className="team-phd-grid">
               {phd.map((m, i) => (

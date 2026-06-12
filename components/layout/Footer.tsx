@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="footer-grid">
           <div>
             <div className="footer-brand">
-              Presidency University<br /><em>Physics</em> Society
+              Presidency University<br /><em style={{ color: '#5d0707', fontStyle: 'italic' }}>Physics</em> Society
             </div>
             <div className="footer-addr">
               86/1 College Street<br />

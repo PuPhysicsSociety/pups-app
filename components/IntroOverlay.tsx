@@ -19,7 +19,7 @@ export default function IntroOverlay() {
       document.body.style.overflow = '';
     }, 600);
 
-    const SCROLL_RANGE = 320; // px of scroll to complete the transition
+    const SCROLL_RANGE = 50; // px of scroll to complete the transition
 
     const onScroll = () => {
       if (doneRef.current) return;

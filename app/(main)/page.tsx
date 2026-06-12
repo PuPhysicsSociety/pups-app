@@ -27,20 +27,20 @@ export default function Home() {
         <div className="wrap">
           <div className="home-hero" style={{ border: 'none' }}>
             <div>
-              <div className="home-kicker">Presidency University · Est. 2025</div>
+              <div className="home-kicker">Presidency University · Est. 1817</div>
               <h1 className="home-h1">
                 Fostering scientific<br />
                 dialogue, outreach<br />
                 &amp; <em>community</em>.
               </h1>
               <p className="home-lede">
-                The Presidency University Physics Society organises weekly colloquia, panel discussions,
+                The Presidency University Physics Society organises weekly colloquium under the Scientific Discussion Forum, panel discussions,
                 and thematic events that cultivate a vibrant academic culture centred around the exploration
                 of physics.
               </p>
               <div className="home-cta">
                 <Link href="/events" className="btn primary">Explore events</Link>
-                <Link href="/colloquium" className="btn">Browse colloquia</Link>
+                <Link href="/colloquium" className="btn">Browse colloquium</Link>
               </div>
             </div>
 
@@ -101,7 +101,7 @@ export default function Home() {
           <div className="pillars">
             <div className="pillar">
               <div className="pillar-num">01</div>
-              <h3>Weekly Colloquia</h3>
+              <h3>Student Discussion Forum</h3>
               <p>Expert talks on cutting-edge physics research, open to all students and faculty each week.</p>
             </div>
             <div className="pillar">

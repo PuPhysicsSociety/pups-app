@@ -13,9 +13,12 @@
   --cr:     #9b7230;          /* gold — slightly deeper, more readable */
   --cr2:    #b8893d;          /* hover gold */
   --tx:     #1a1710;          /* near-black, warm */
-  --tx2:    rgba(26,23,16,.82);  /* body copy — more readable */
-  --tx3:    rgba(26,23,16,.60);  /* secondary — up from .55 */
-  --tx4:    rgba(26,23,16,.38);  /* muted labels — up from .32 */
+ /* --tx2:    rgba(26,23,16,.82); */  /* body copy — more readable */
+ /* --tx3:    rgba(26,23,16,.60); */  /* secondary — up from .55 */
+ /* --tx4:    rgba(26,23,16,.38); */  /* muted labels — up from .32 */
+  --tx2: rgba(26,23,16,.94);
+  --tx3: rgba(26,23,16,.72);
+  --tx4: rgba(26,23,16,.50);
   --rule:   rgba(26,23,16,.13);
   --nav-h:  62px;
 }

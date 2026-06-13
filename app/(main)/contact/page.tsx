@@ -1,7 +1,6 @@
 import React from 'react';
 import { Instagram, Linkedin, Youtube } from 'lucide-react';
 
-// Facebook icon as inline SVG (not in Lucide)
 function FacebookIcon({ size = 18 }: { size?: number }) {
   return (
     <svg
@@ -112,7 +111,7 @@ export default function ContactPage() {
               {/* Social icons row */}
               <div className="ci" style={{ alignItems: 'center' }}>
                 <span className="ci-k">Social</span>
-                <span style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
+                <span style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
                   {SOCIALS.map(({ label, href, icon }) => (
                     <a
                       key={label}
@@ -131,18 +130,6 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
-
-      <style>{`
-        .social-icon-link {
-          color: var(--tx4);
-          display: flex;
-          align-items: center;
-          transition: color 0.18s ease;
-        }
-        .social-icon-link:hover {
-          color: var(--cr);
-        }
-      `}</style>
     </section>
   );
 }

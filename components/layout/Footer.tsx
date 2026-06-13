@@ -39,7 +39,7 @@ export default function Footer() {
 
           <div className="footer-col">
             <h5>Events and Colloquia</h5>
-            <Link href="/colloquium">All Colloquia</Link>
+            <Link href="/colloquium">All Colloquium</Link>
             <Link href="/events">All Events</Link>
           </div>
         </div>

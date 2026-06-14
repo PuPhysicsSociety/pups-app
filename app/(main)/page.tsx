@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getEvents, getColloquium } from '@/lib/api';
 import EquationStrip from '@/components/ui/EquationStrip';
+import EventImageMarquee from '@/components/ui/EventImageMarquee';
 
 export default function Home() {
   const [latestEvent, setLatestEvent] = useState<any>(null);
@@ -22,6 +23,7 @@ export default function Home() {
 
   return (
     <>
+      {/* <EventImageMarquee /> */}
       {/* Hero */}
       <section className="section" style={{ borderBottom: '1px solid var(--rule)' }}>
         <div className="wrap">

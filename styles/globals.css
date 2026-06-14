@@ -4,6 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 /* ── Design tokens (Light theme) ── */
 :root {
   --bg:     #f5efe0;          /* slightly richer warm base */
@@ -580,3 +581,72 @@ site-footer { background: var(--s2); padding: 48px 0 32px; border-top: 1px solid
   transition: color 0.18s ease;
 }
 .social-icon-link:hover { color: var(--cr); }
+
+/* ── Event list row layout (replaces inline grid in events/page.tsx) ── */
+.ev-row {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 28px;
+  align-items: start;
+  padding: 28px 0;
+  border-top: 1px solid var(--rule);
+  transition: background 0.15s;
+}
+.ev-row:hover { background: var(--s1); }
+.ev-row-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  border: 1px solid var(--rule); color: var(--tx3);
+  padding: 5px 10px; white-space: nowrap;
+  align-self: start; margin-top: 4px;
+}
+
+/* ── Event detail hero grid (replaces inline grid in events/[id]/page.tsx) ── */
+.ev-detail-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 48px;
+  align-items: start;
+}
+
+/* ── Event detail body grid (replaces inline grid in events/[id]/page.tsx) ── */
+.ev-detail-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 56px;
+  align-items: start;
+}
+
+/* ── Mobile overrides for event pages ── */
+@media (max-width: 768px) {
+  /* Event list row — hide tag, two columns */
+  .ev-row {
+    grid-template-columns: 72px 1fr;
+    gap: 16px;
+    padding: 20px 0;
+  }
+  .ev-row-tag { display: none; }
+
+  /* Event detail hero — single column, image moves above title */
+  .ev-detail-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  /* Move poster (last child) above title on mobile */
+  .ev-detail-hero-grid > :last-child { order: -1; }
+
+  /* Event detail body — single column, sidebar drops below */
+  .ev-detail-body-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Event list row — full width single column, hide date too */
+  .ev-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .ev-row > :first-child { display: none; } /* hide date column */
+}

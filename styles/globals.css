@@ -4,7 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 /* ── Design tokens (Light theme) ── */
 :root {
   --bg:     #f5efe0;          /* slightly richer warm base */
@@ -14,12 +13,9 @@
   --cr:     #9b7230;          /* gold — slightly deeper, more readable */
   --cr2:    #b8893d;          /* hover gold */
   --tx:     #1a1710;          /* near-black, warm */
- /* --tx2:    rgba(26,23,16,.82); */  /* body copy — more readable */
- /* --tx3:    rgba(26,23,16,.60); */  /* secondary — up from .55 */
- /* --tx4:    rgba(26,23,16,.38); */  /* muted labels — up from .32 */
-  --tx2: rgba(26,23,16,.94);
-  --tx3: rgba(26,23,16,.72);
-  --tx4: rgba(26,23,16,.50);
+  --tx2:    rgba(26,23,16,.82);  /* body copy — more readable */
+  --tx3:    rgba(26,23,16,.60);  /* secondary — up from .55 */
+  --tx4:    rgba(26,23,16,.38);  /* muted labels — up from .32 */
   --rule:   rgba(26,23,16,.13);
   --nav-h:  62px;
 }
@@ -593,12 +589,28 @@ site-footer { background: var(--s2); padding: 48px 0 32px; border-top: 1px solid
   transition: background 0.15s;
 }
 .ev-row:hover { background: var(--s1); }
-.ev-row-tag {
+
+/* Shared tag styling */
+.ev-row-tag-desktop,
+.ev-row-tag-mobile {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
   border: 1px solid var(--rule); color: var(--tx3);
   padding: 5px 10px; white-space: nowrap;
-  align-self: start; margin-top: 4px;
+}
+
+/* Desktop tag — far-right column, shown on desktop only */
+.ev-row-tag-desktop {
+  align-self: start;
+  margin-top: 4px;
+  display: block; /* visible on desktop */
+}
+
+/* Mobile tag — below title inside content column, hidden on desktop */
+.ev-row-tag-mobile {
+  display: none; /* hidden on desktop */
+  margin-bottom: 10px;
+  /* left-aligned naturally since it's inside the content div */
 }
 
 /* ── Event detail hero grid (replaces inline grid in events/[id]/page.tsx) ── */
@@ -619,20 +631,20 @@ site-footer { background: var(--s2); padding: 48px 0 32px; border-top: 1px solid
 
 /* ── Mobile overrides for event pages ── */
 @media (max-width: 768px) {
-  /* Event list row — hide tag, two columns */
+  /* Event list row — two columns, desktop tag hidden, mobile tag shown */
   .ev-row {
     grid-template-columns: 72px 1fr;
     gap: 16px;
     padding: 20px 0;
   }
-  .ev-row-tag { display: none; }
+  .ev-row-tag-desktop { display: none; }
+  .ev-row-tag-mobile  { display: inline-block; }
 
   /* Event detail hero — single column, image moves above title */
   .ev-detail-hero-grid {
     grid-template-columns: 1fr;
     gap: 24px;
   }
-  /* Move poster (last child) above title on mobile */
   .ev-detail-hero-grid > :last-child { order: -1; }
 
   /* Event detail body — single column, sidebar drops below */
@@ -643,10 +655,10 @@ site-footer { background: var(--s2); padding: 48px 0 32px; border-top: 1px solid
 }
 
 @media (max-width: 480px) {
-  /* Event list row — full width single column, hide date too */
+  /* Event list row — full width, hide date column */
   .ev-row {
     grid-template-columns: 1fr;
     gap: 12px;
   }
-  .ev-row > :first-child { display: none; } /* hide date column */
+  .ev-row > :first-child { display: none; }
 }

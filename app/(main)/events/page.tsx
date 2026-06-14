@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { getEvents } from '@/lib/api';
 import { UnifiedEvent } from '../../../types';
 
-// T object — fallbacks updated to match current token values
 const T = {
   tx:    'var(--tx,   #1a1710)',
   tx2:   'var(--tx2,  rgba(26,23,16,.94))',
@@ -47,16 +46,10 @@ function EventRow({ event, onClick }: EventRowProps) {
   const tag           = TYPE_LABELS[event.type] || event.type;
 
   return (
-    // className="ev-row" handles the grid layout + responsive collapse
-    // cursor/background/border stay inline since they're dynamic or non-responsive
     <article
       className="ev-row"
       onClick={onClick}
-      style={{
-        cursor:     onClick ? 'pointer' : 'default',
-        color:      T.tx,
-        textDecoration: 'none',
-      }}
+      style={{ cursor: onClick ? 'pointer' : 'default', color: T.tx }}
     >
       {/* Date column */}
       <div style={{ paddingTop: 2 }}>
@@ -84,6 +77,9 @@ function EventRow({ event, onClick }: EventRowProps) {
         }}>
           {event.title}
         </h3>
+
+        {/* Tag — mobile only, sits below title, hidden on desktop */}
+        <div className="ev-row-tag-mobile">{tag}</div>
 
         {firstLecturer && (
           <p style={{
@@ -132,10 +128,8 @@ function EventRow({ event, onClick }: EventRowProps) {
         )}
       </div>
 
-      {/* Tag column — hidden on mobile via .ev-row-tag CSS class */}
-      <div className="ev-row-tag">
-        {tag}
-      </div>
+      {/* Tag — desktop only, far-right column, hidden on mobile */}
+      <div className="ev-row-tag-desktop">{tag}</div>
     </article>
   );
 }

@@ -634,7 +634,7 @@ export default function TeamPage() {
             <div className="team-section-head">
               <div className="team-section-label">
                 <b>i</b>
-                Executive
+                
               </div>
               <h2 className="team-section-title">Core <em>committee</em>.</h2>
             </div>
@@ -654,7 +654,7 @@ export default function TeamPage() {
             <div className="team-section-head">
               <div className="team-section-label">
                 <b>ii</b>
-                Committees
+                
               </div>
               <h2 className="team-section-title">Sub <em>committees</em>.</h2>
             </div>
@@ -674,7 +674,7 @@ export default function TeamPage() {
             <div className="team-section-head">
               <div className="team-section-label">
                 <b>iii</b>
-                Scholars
+                
               </div>
               <h2 className="team-section-title">Academic <em>committee</em>.</h2>
             </div>

@@ -4,13 +4,14 @@ import { useRouter } from 'next/navigation';
 import { getEvents } from '@/lib/api';
 import { UnifiedEvent } from '../../../types';
 
+// T object — fallbacks updated to match current token values
 const T = {
-  tx:    'var(--tx,   #1f1b16)',
-  tx2:   'var(--tx2,  rgba(31,27,22,.78))',
-  tx3:   'var(--tx3,  rgba(31,27,22,.55))',
-  tx4:   'var(--tx4,  rgba(31,27,22,.32))',
-  rule:  'var(--rule, rgba(31,27,22,.14))',
-  cr:    'var(--cr,   #a07a36)',
+  tx:    'var(--tx,   #1a1710)',
+  tx2:   'var(--tx2,  rgba(26,23,16,.94))',
+  tx3:   'var(--tx3,  rgba(26,23,16,.72))',
+  tx4:   'var(--tx4,  rgba(26,23,16,.50))',
+  rule:  'var(--rule, rgba(26,23,16,.13))',
+  cr:    'var(--cr,   #9b7230)',
   serif: "'Cormorant Garamond', Georgia, serif",
   mono:  "'IBM Plex Mono', 'Courier New', monospace",
 } as const;
@@ -40,27 +41,21 @@ interface EventRowProps {
 }
 
 function EventRow({ event, onClick }: EventRowProps) {
-  const [hovered, setHovered] = React.useState(false);
   const firstLecturer = event.lecturerDetails?.[0];
-  const day       = fmtDay(event.dateTime?.start);
-  const monthYear = fmtMonthYear(event.dateTime?.start);
-  const tag       = TYPE_LABELS[event.type] || event.type;
+  const day           = fmtDay(event.dateTime?.start);
+  const monthYear     = fmtMonthYear(event.dateTime?.start);
+  const tag           = TYPE_LABELS[event.type] || event.type;
 
   return (
+    // className="ev-row" handles the grid layout + responsive collapse
+    // cursor/background/border stay inline since they're dynamic or non-responsive
     <article
+      className="ev-row"
       onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       style={{
-        display: 'grid',
-        gridTemplateColumns: '96px 1fr auto',
-        gap: '28px',
-        alignItems: 'start',
-        padding: '28px 0',
-        borderTop: `1px solid ${T.rule}`,
-        cursor: onClick ? 'pointer' : 'default',
-        background: hovered && onClick ? 'rgba(31,27,22,.025)' : 'transparent',
-        transition: 'background 0.15s',
+        cursor:     onClick ? 'pointer' : 'default',
+        color:      T.tx,
+        textDecoration: 'none',
       }}
     >
       {/* Date column */}
@@ -93,7 +88,8 @@ function EventRow({ event, onClick }: EventRowProps) {
         {firstLecturer && (
           <p style={{
             fontFamily: T.mono, fontSize: 10.5, letterSpacing: '0.04em',
-            color: T.tx3, lineHeight: 1.75, marginBottom: event.description ? 10 : 0,
+            color: T.tx3, lineHeight: 1.75,
+            marginBottom: event.description ? 10 : 0,
           }}>
             <span style={{ color: T.tx2, fontWeight: 500 }}>{firstLecturer.name}</span>
             {firstLecturer.affiliation && (
@@ -116,12 +112,19 @@ function EventRow({ event, onClick }: EventRowProps) {
         {(event.dateTime?.schedule || event.venue || event.mode === 'online') && (
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' as const }}>
             {event.dateTime?.schedule && (
-              <span style={{ fontFamily: T.mono, fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: T.tx4 }}>
-                <span style={{ color: T.cr, marginRight: 6 }}>◦</span>{event.dateTime.schedule}
+              <span style={{
+                fontFamily: T.mono, fontSize: 9, letterSpacing: '0.22em',
+                textTransform: 'uppercase', color: T.tx4,
+              }}>
+                <span style={{ color: T.cr, marginRight: 6 }}>◦</span>
+                {event.dateTime.schedule}
               </span>
             )}
             {(event.venue || event.mode === 'online') && (
-              <span style={{ fontFamily: T.mono, fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: T.tx4 }}>
+              <span style={{
+                fontFamily: T.mono, fontSize: 9, letterSpacing: '0.22em',
+                textTransform: 'uppercase', color: T.tx4,
+              }}>
                 {event.venue || 'Online'}
               </span>
             )}
@@ -129,16 +132,9 @@ function EventRow({ event, onClick }: EventRowProps) {
         )}
       </div>
 
-      {/* Tag column */}
-      <div style={{ paddingTop: 4 }}>
-        <span style={{
-          fontFamily: T.mono, fontSize: 9, letterSpacing: '0.18em',
-          textTransform: 'uppercase' as const,
-          border: `1px solid ${T.rule}`, color: T.tx3,
-          padding: '5px 10px', whiteSpace: 'nowrap' as const,
-        }}>
-          {tag}
-        </span>
+      {/* Tag column — hidden on mobile via .ev-row-tag CSS class */}
+      <div className="ev-row-tag">
+        {tag}
       </div>
     </article>
   );
@@ -166,15 +162,22 @@ export default function EventsPage() {
         </div>
 
         {loading && (
-          <div style={{ padding: '40px 0', color: 'var(--tx4)', fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase' }}>
+          <div style={{
+            padding: '40px 0', color: 'var(--tx4)',
+            fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase',
+          }}>
             Loading…
           </div>
         )}
         {error && (
-          <div style={{ padding: '40px 0', color: '#8c1c1c', fontSize: 12 }}>{error}</div>
+          <div style={{ padding: '40px 0', color: '#8c1c1c', fontSize: 12 }}>
+            {error}
+          </div>
         )}
         {!loading && !error && events.length === 0 && (
-          <div style={{ padding: '40px 0', color: 'var(--tx4)', fontSize: 12 }}>No events available yet.</div>
+          <div style={{ padding: '40px 0', color: 'var(--tx4)', fontSize: 12 }}>
+            No events available yet.
+          </div>
         )}
 
         {!loading && !error && events.length > 0 && (

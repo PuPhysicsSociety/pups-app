@@ -43,7 +43,7 @@ function MemberAvatar({ member, size = 'lg' }: { member: TeamMember; size?: 'lg'
       <div className="team-avatar-wrap">
         {hasImage ? (
           <img
-            src={`/${member.image}`}
+            src={member.image}
             alt={member.name}
             className="team-avatar-img"
             onError={() => setImgError(true)}
@@ -62,7 +62,7 @@ function MemberAvatar({ member, size = 'lg' }: { member: TeamMember; size?: 'lg'
     <div className="team-avatar-sm">
       {hasImage ? (
         <img
-          src={`/${member.image}`}
+          src={member.image}
           alt={member.name}
           className="team-avatar-img-sm"
           onError={() => setImgError(true)}

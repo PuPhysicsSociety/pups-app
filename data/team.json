@@ -3,182 +3,272 @@
     "id":1,
     "name": "Ritom Bid",
     "role": "President",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "linkedin_url": "https://www.linkedin.com/in/ritom-bid-0a8bb2322",
+    "email": "bidritom@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431631/Ritom_Bid_gfysb3.jpg"
   },
   {
     "id":2,
     "name": "Baibhab Kar",
     "role": "Vice-President",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "linkedin_url": "https://www.linkedin.com/in/baibhab-kar-810a2a411",
+    "email": "karbaibhab@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431630/Baibhab_Kar_ropvhb.jpg"
   },
   {
     "id":3,
     "name": "Nanda Gopal Raha",
     "role": "Treasurer",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "linkedin_url": "https://www.linkedin.com/in/nanda-gopal-raha-2b4238326",
+    "email": "nandagopalraha123@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431630/Nanda_Gopal_Raha_nrukjr.jpg"
   },
   {
     "id":4,
     "name": "Sourin Debnath",
     "role": "Secretary",
     "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "email": "srdn80@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431634/sourin_debnath_xtnpkb.jpg"
   },
   {
     "id":5,
     "name": "Shawon Kumar Pani",
     "role": "Assistant Secretary",
     "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "email": "shawonpani34@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431633/Shawon_Kumar_Pani_mqyx6j.jpg"
   },
   {
     "id":6,
     "name": "Sumedha Mallick",
     "role": "PR and Media Committee Head",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "linkedin_url": "https://www.linkedin.com/in/sumedha-mallick-866006354",
+    "email": "sumedhamallick33@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431573/Sumedha_Mallick_lkamqt.jpg"
   },
   {
     "id":7,
     "name": "Aratrika Sengupta",
     "role": "PR and Media Committee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "linkedin_url": "http://www.linkedin.com/in/aratrika-sengupta-237344384",
+    "email": "aratrikasengupta.10c.54@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431564/Aratrika_Sengupta_ndws09.jpg"
   },
   {
     "id":8,
-    "name": "Sayantan Majumder",
+    "name": "Eeshani Ghosh",
     "role": "PR and Media Committee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "linkedin_url": "https://www.linkedin.com/in/eeshani-ghosh-3a3737393",
+    "email": "eeshanighosh.ix@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431567/Eeshani_Ghosh_nsuvrn.jpg"
   },
   {
     "id":9,
     "name": "Irene Altaf",
     "role": "PR and Media Committee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "linkedin_url": "http://www.linkedin.com/in/irenealtaf",
+    "email": "irene.altaf09@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431570/Irene_Altaf_fbetjq.jpg"
   },
   {
     "id":10,
     "name": "Deepan Dhawa",
     "role": "PR and Media Committee Member",
     "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "email": "deepan.dhawa@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431566/Deepan_Dhawa_jjancb.jpg"
   },
   {
     "id":11,
-    "name": "Paramita Patra",
+    "name": "Imon Ghor",
     "role": "PR and Media Committee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "linkedin_url": "https://www.linkedin.com/in/imon-ghor-8439571ba",
+    "email": "imonghor13@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431568/Imon_Ghor_l2n2p3.jpg"
   },
   {
     "id":12,
-    "name": "Sampriti Das",
+    "name": "Arya Chakraborty",
     "role": "PR and Media Committee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "linkedin_url": "https://in.linkedin.com/in/arya-chakraborty-62654a274",
+    "email": "achakraborty.jpg@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431565/Arya_Chakraborty_z31mje.jpg"
   },
   {
     "id":13,
-    "name": "Archisman Chatterjee",
-    "role": "Event Coordination Commitee Head",
+    "name": "Angshuk Jana",
+    "role": "PR and Media Committee Member",
     "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "email": "janaangshuk0407@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431564/Angshuk_Jana_tq9cep.jpg"
   },
   {
     "id":14,
-    "name": "Krishnendu Mandal",
-    "role": "Event Coordination Commitee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "name": "Sucheta Pattanayak",
+    "role": "PR and Media Committee Member",
+    "linkedin_url": "http://www.linkedin.com/in/sucheta-pattanayak-933143392",
+    "email": "sucheta2506@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431572/Sucheta_Pattanayak_cwsmp2.jpg"
   },
   {
     "id":15,
-    "name": "Swarnava Bhattacharjee",
-    "role": "Event Coordination Commitee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "name": "Archisman Chatterjee",
+    "role": "Event Coordination Commitee Head",
+    "linkedin_url": "https://www.linkedin.com/in/archisman-chatterjee-7a7473369",
+    "email": "archismanchatterjee12@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431597/Archisman_Chatterjee_vuupdv.jpg"
   },
   {
     "id":16,
-    "name": "Mrinmay Das Adhikary",
+    "name": "Rahul Das",
     "role": "Event Coordination Commitee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "linkedin_url": "https://www.linkedin.com/in/rahul-das-a12a8b283?",
+    "email": "rahuldas702923@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431604/Rahul_Das_jd9ghb.jpg"
   },
   {
     "id":17,
-    "name": "Eeshani Ghosh",
+    "name": "Suhana Adhikary",
     "role": "Event Coordination Commitee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "linkedin_url": "https://www.linkedin.com/in/suhana-a-261638245",
+    "email": "suhanaadhikary15@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431605/Suhana_Adhikary_wwgrst.jpg"
   },
   {
     "id":18,
-    "name": "Suhana Adhikary",
+    "name": "Eeshani Ghosh",
     "role": "Event Coordination Commitee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "linkedin_url": "https://www.linkedin.com/in/eeshani-ghosh-3a3737393",
+    "email": "eeshanighosh.ix@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431600/Eeshani_Ghosh_ql2uvd.jpg"
   },
   {
     "id":19,
-    "name": "Rahul Das",
+    "name": "Krishnendu Mandal",
     "role": "Event Coordination Commitee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "linkedin_url": "https://www.linkedin.com/in/krishnendu-mandal-264b31344",
+    "email": "nendu.960@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431602/Krishnendu_Mandal_m2sss7.jpg"
   },
   {
     "id":20,
-    "name": "Dwaipayan Mukherjee",
-    "role": "Technical Committee Head",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "name": "Priyanshu Bhowal",
+    "role": "Event Coordination Commitee Member",
+    "linkedin_url": "https://www.linkedin.com/in/priyanshu-bhowal-a527982ba",
+    "email": "priyanshubhowal030@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431602/Priyanshu_Bhowal_ptt5gd.jpg"
   },
   {
     "id":21,
-    "name": "Arka Basak",
-    "role": "Technical Committee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "name": "Suryadeep Mukherjee",
+    "role": "Event Coordination Commitee Member",
+    "linkedin_url": "https://www.linkedin.com/in/suryadeep-mukherjee-038a533b4",
+    "email": "mukherjee.suryadeep6@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431606/Suryadeep_Mukherjee_omuqhl.jpg"
   },
   {
     "id":22,
-    "name": "Aritra Bakshi",
-    "role": "Technical Committee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "name": "Swastick Chatterjee",
+    "role": "Event Coordination Commitee Member",
+    "linkedin_url": "https://www.linkedin.com/in/swastick-chatterjee-2832b539b",
+    "email": "chatterjeeswastick@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431607/Swastick_Chatterjee_t5l06i.jpg"
   },
   {
     "id":23,
-    "name": "Samadrito Joarder",
-    "role": "Technical Committee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "name": "Arya Chakraborty",
+    "role": "Event Coordination Commitee Member",
+    "linkedin_url": "https://in.linkedin.com/in/arya-chakraborty-62654a274",
+    "email": "achakraborty.jpg@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431598/Arya_Chakraborty_zhwtl6.jpg"
   },
   {
     "id":24,
-    "name": "Rohan Chakraborty",
-    "role": "Technical Committee Member",
+    "name": "Dwaipayan Mukherjee",
+    "role": "Technical Committee Head",
     "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "email": "dwaipayanmukherjee100@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431519/Dwaipayan_Mukherjee_hgdb10.jpg"
   },
   {
     "id":25,
-    "name": "Suvamay Pramanik",
-    "role": "PhD Scholar",
-    "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "name": "Arka Basak",
+    "role": "Technical Committee Member",
+    "linkedin_url": "https://www.linkedin.com/in/arka-basak-9ab939336",
+    "email": "arkabasak63@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781432050/Arka_Basak_ebc776.jpg"
   },
   {
     "id":26,
+    "name": "Aritra Bakshi",
+    "role": "Technical Committee Member",
+    "linkedin_url": "https://www.linkedin.com/in/aritra-bakshi",
+    "email": "aritra1310@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431514/Aritra_Bakshi_jqzmhy.jpg"
+  },
+  {
+    "id":27,
+    "name": "Samadrito Joarder",
+    "role": "Technical Committee Member",
+    "linkedin_url": "https://www.linkedin.com/in/samadrito-joarder-595989414",
+    "email": "samadritojoarder@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431516/Samadrito_Joarder_iijeji.jpg"
+  },
+  {
+    "id":28,
+    "name": "Imon Ghor",
+    "role": "Technical Committee Member",
+    "linkedin_url": "https://www.linkedin.com/in/imon-ghor-8439571ba",
+    "email": "imonghor13@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431514/Imon_Ghor_oo2qfx.jpg"
+  },
+  {
+    "id":29,
+    "name": "Ayona Ganguly",
+    "role": "Technical Committee Member",
+    "linkedin_url": "https://www.linkedin.com/in/ayona-ganguly-5b6455339",
+    "email": "tiasiayona@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431514/Ayona_Ganguly_pzqjbl.jpg"
+  },
+  {
+    "id":30,
+    "name": "Soura Tanay Roy",
+    "role": "Technical Committee Member",
+    "linkedin_url": "http://linkedin.com/in/strpresi",
+    "email": "souratanayroy@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431518/Soura_Tanay_Roy_wgbfah.jpg"
+  },
+  {
+    "id":31,
+    "name": "Ankit Bera",
+    "role": "Technical Committee Member",
+    "linkedin_url": "https://www.linkedin.com/in/ankit-bera-62415b328/",
+    "email": "ankitbera139@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431513/Ankit_Bera_ljbrng.jpg"
+  },
+  {
+    "id":32,
+    "name": "Soumili Ghosh",
+    "role": "Technical Committee Member",
+    "linkedin_url": "https://linkedin.com/in/url",
+    "email": "sg2614596@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431516/Soumili_Ghosh_uqgba5.jpg"
+  },
+  {
+    "id":33,
+    "name": "Suvamay Pramanik",
+    "role": "PhD Scholar",
+    "linkedin_url": "https://www.linkedin.com/in/suvamay-pramanik-079235ab",
+    "email": "psuvamay@gmail.com",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431660/Suvamay_Pramanik_p6uceu.jpg"
+  },
+  {
+    "id":34,
     "name": "Amit Das",
     "role": "PhD Scholar",
     "linkedin_url": "https://linkedin.com/in/url",
-    "email": "@example.com"
+    "email": "amit.rs@presiuniv.ac.in",
+    "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431659/Amit_Das_wlmmdd.jpg"
   }
 ]

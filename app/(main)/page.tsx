@@ -34,13 +34,13 @@ export default function Home() {
                 &amp; <em>community</em>.
               </h1>
               <p className="home-lede">
-                The Presidency University Physics Society organises weekly colloquium under the Scientific Discussion Forum, panel discussions,
+                The Presidency University Physics Society organises weekly colloquia under the Scientific Discussion Forum, panel discussions,
                 and thematic events that cultivate a vibrant academic culture centred around the exploration
                 of physics.
               </p>
               <div className="home-cta">
                 <Link href="/events" className="btn primary">Explore events</Link>
-                <Link href="/colloquium" className="btn">Browse colloquium</Link>
+                <Link href="/colloquium" className="btn">Browse colloquia</Link>
               </div>
             </div>
 

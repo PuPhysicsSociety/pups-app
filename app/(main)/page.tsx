@@ -81,7 +81,7 @@ export default function Home() {
                     <em className="aside-arr">→</em>
                     Meet the people behind PUPS
                   </div>
-                  <div className="aside-meta">Exec committee · PhD scholars · Members</div>
+                  <div className="aside-meta">Core committee · Sub committee · Academic committee</div>
                 </Link>
               </div>
             )}

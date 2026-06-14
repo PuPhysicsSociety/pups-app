@@ -23,6 +23,7 @@
  */
 
 import React, { useId } from 'react';
+import katex from 'katex';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -77,15 +78,15 @@ export interface EquationStripProps {
 // ─── Defaults ─────────────────────────────────────────────────────────────────
 
 const DEFAULT_EQUATIONS: string[] = [
-  'iℏ ∂Ψ/∂t = ĤΨ',
-  '∮ B · dℓ = μ₀ I\u2091\u2099',
-  'S = k\u0299 ln Ω',
-  'E² = p²c² + m₀²c⁴',
-  '∇×B = μ₀J + μ₀ε₀∂E/∂t',
-  'F = m.a',
-  '\u0394x\u0394p \u2265 \u210f/2',
-  '\u2207\u00b7E = \u03c1/\u03b5\u2080',
-  '\u006E\u1D62 \u003D \u0067\u1D62 \u002F (\u0065\u005E(\u03B2\u03B5\u1D62 \u2212 \u03BC) \u2212 \u0031)',
+  'i\\hbar \\frac{\\partial \\Psi}{\\partial t} = \\hat{H}\\Psi',
+  '\\oint \\mathbf{B} \\cdot d\\boldsymbol{\\ell} = \\mu_0 I_{\\text{enc}}',
+  'S = k_B \\ln \\Omega',
+  'E^2 = p^2c^2 + m_0^2c^4',
+  '\\nabla \\times \\mathbf{B} = \\mu_0 \\mathbf{J} + \\mu_0 \\varepsilon_0 \\frac{\\partial \\mathbf{E}}{\\partial t}',
+  '\\mathbf{F} = m\\mathbf{a}',
+  '\\Delta x \\Delta p \\ge \\frac{\\hbar}{2}',
+  '\\nabla \\cdot \\mathbf{E} = \\frac{\\rho}{\\varepsilon_0}',
+  'n_i = \\frac{g_i}{e^{\\beta(\\varepsilon_i - \\mu)} - 1}',
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -144,11 +145,12 @@ export default function EquationStrip({
     padding: `0 ${itemPadding}px`,
     borderRight: `1px solid ${borderColor}`,
     fontFamily,
-    fontStyle: 'italic',
     fontSize,
     color,
     lineHeight: 1,
     userSelect: 'none',
+    display: 'inline-flex',
+    alignItems: 'center',
   };
 
   return (
@@ -158,9 +160,19 @@ export default function EquationStrip({
 
       <div className={`eq-strip${className ? ` ${className}` : ''}`} style={stripStyle}>
         <div style={trackStyle}>
-          {items.map((eq, i) => (
-            <span key={i} style={itemStyle}>{eq}</span>
-          ))}
+          {items.map((eq, i) => {
+            const html = katex.renderToString(eq, {
+              throwOnError: false,
+              displayMode: false,
+            });
+            return (
+              <span
+                key={i}
+                style={itemStyle}
+                dangerouslySetInnerHTML={{ __html: html }}
+              />
+            );
+          })}
         </div>
       </div>
     </>

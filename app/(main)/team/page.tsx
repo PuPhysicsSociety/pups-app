@@ -17,6 +17,7 @@ interface TeamMember {
 const EXEC_KEYWORDS = ['president', 'vice-president', 'secretary', 'assistant secretary', 'treasurer'];
 const HEAD_KEYWORDS = ['head'];
 const PHD_KEYWORDS  = ['phd scholar', 'phd'];
+// const PHD_KEYWORDS  = ['Academic committee'];
 
 function classify(member: TeamMember): 'exec' | 'head' | 'phd' | 'member' {
   const r = (member.role || '').toLowerCase();
@@ -684,7 +685,8 @@ export default function TeamPage() {
                   <MemberAvatar member={m} size="sm" />
                   <div>
                     <div className="team-phd-name">{m.name}</div>
-                    <div className="team-phd-role">{m.role}</div>
+                    {/* <div className="team-phd-role">{m.role}</div> */}
+                    <div className="team-phd-role">Academic Committee Member</div>
                     <div className="team-phd-links">
                       {m.linkedin_url && (
                         <a

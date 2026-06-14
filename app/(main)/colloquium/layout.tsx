@@ -3,10 +3,10 @@ import React from 'react';
 
 export const metadata: Metadata = {
   title: 'Colloquium | Presidency University Physics Society',
-  description: 'Weekly colloquiums under the Scientific Discussion Forum organized by the Presidency University Physics Society (PUPS).',
+  description: 'Weekly colloquia under the Scientific Discussion Forum organized by the Presidency University Physics Society (PUPS).',
   openGraph: {
     title: 'Colloquium | Presidency University Physics Society',
-    description: 'Weekly colloquiums under the Scientific Discussion Forum organized by the Presidency University Physics Society (PUPS).',
+    description: 'Weekly colloquia under the Scientific Discussion Forum organized by the Presidency University Physics Society (PUPS).',
   },
 };
 

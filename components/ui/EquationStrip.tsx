@@ -78,13 +78,14 @@ export interface EquationStripProps {
 
 const DEFAULT_EQUATIONS: string[] = [
   'iℏ ∂Ψ/∂t = ĤΨ',
-  '∮ B · dℓ = μ₀ I\u1D49\u207F\u1D9C',
+  '∮ B · dℓ = μ₀ I\u2091\u2099',
   'S = k\u0299 ln Ω',
-  'E = mc²',
-  'R\u03bc\u03bd \u2212 \u00bdg\u03bc\u03bdR = 8\u03c0G T\u03bc\u03bd/c\u2074',
+  'E² = p²c² + m₀²c⁴',
+  '∇×B = μ₀J + μ₀ε₀∂E/∂t',
+  'F = m.a',
   '\u0394x\u0394p \u2265 \u210f/2',
   '\u2207\u00b7E = \u03c1/\u03b5\u2080',
-  'n\u1D62 = g\u1D62\u00a0/\u00a0(e\u207B\u207B\u00b9 \u2212 1)',
+  '\u006E\u1D62 \u003D \u0067\u1D62 \u002F (\u0065\u005E(\u03B2\u03B5\u1D62 \u2212 \u03BC) \u2212 \u0031)',
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────

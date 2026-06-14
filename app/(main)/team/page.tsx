@@ -636,7 +636,7 @@ export default function TeamPage() {
                 <b>i</b>
                 Executive
               </div>
-              <h2 className="team-section-title">Executive <em>committee</em>.</h2>
+              <h2 className="team-section-title">Core <em>committee</em>.</h2>
             </div>
             <div className="team-cards-grid">
               {exec.map((m, i) => (
@@ -656,7 +656,7 @@ export default function TeamPage() {
                 <b>ii</b>
                 Committees
               </div>
-              <h2 className="team-section-title">Society <em>committees</em>.</h2>
+              <h2 className="team-section-title">Sub <em>committees</em>.</h2>
             </div>
             <div className="team-committees">
               {Object.entries(committeeGroups).map(([groupName, groupMembers]) => (

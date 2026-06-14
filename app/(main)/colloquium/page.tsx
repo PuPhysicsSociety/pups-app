@@ -45,7 +45,7 @@ export default function ColloquiumPage() {
                 {c.speaker && <div className="coll-spk">{c.speaker}{c.department ? ` · ${c.department}` : ''}</div>}
                 {c.abstract && <p className="coll-abs">{c.abstract}</p>}
                 <div className="coll-ft">
-                  <span className="coll-time">{c.date}{c.time ? ` · ${c.time}` : ''}</span>
+                  <span className="coll-time">{c.date}{c.time ? ` · ${new Date(c.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : ''}</span>
                   {c.video && <span className="coll-watch">Watch →</span>}
                 </div>
               </Link>

@@ -99,7 +99,7 @@
     "id":13,
     "name": "Angshuk Jana",
     "role": "PR and Media Committee Member",
-    "linkedin_url": "https://linkedin.com/in/url",
+    "linkedin_url": "https://www.linkedin.com/",
     "email": "janaangshuk0407@gmail.com",
     "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431564/Angshuk_Jana_tq9cep.jpg"
   },
@@ -114,7 +114,7 @@
   {
     "id":15,
     "name": "Archisman Chatterjee",
-    "role": "Event Coordination Commitee Head",
+    "role": "Event Coordination Committee Head",
     "linkedin_url": "https://www.linkedin.com/in/archisman-chatterjee-7a7473369",
     "email": "archismanchatterjee12@gmail.com",
     "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431597/Archisman_Chatterjee_vuupdv.jpg"
@@ -122,7 +122,7 @@
   {
     "id":16,
     "name": "Rahul Das",
-    "role": "Event Coordination Commitee Member",
+    "role": "Event Coordination Committee Member",
     "linkedin_url": "https://www.linkedin.com/in/rahul-das-a12a8b283?",
     "email": "rahuldas702923@gmail.com",
     "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431604/Rahul_Das_jd9ghb.jpg"
@@ -130,7 +130,7 @@
   {
     "id":17,
     "name": "Suhana Adhikary",
-    "role": "Event Coordination Commitee Member",
+    "role": "Event Coordination Committee Member",
     "linkedin_url": "https://www.linkedin.com/in/suhana-a-261638245",
     "email": "suhanaadhikary15@gmail.com",
     "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431605/Suhana_Adhikary_wwgrst.jpg"
@@ -138,7 +138,7 @@
   {
     "id":18,
     "name": "Eeshani Ghosh",
-    "role": "Event Coordination Commitee Member",
+    "role": "Event Coordination Committee Member",
     "linkedin_url": "https://www.linkedin.com/in/eeshani-ghosh-3a3737393",
     "email": "eeshanighosh.ix@gmail.com",
     "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431600/Eeshani_Ghosh_ql2uvd.jpg"
@@ -146,7 +146,7 @@
   {
     "id":19,
     "name": "Krishnendu Mandal",
-    "role": "Event Coordination Commitee Member",
+    "role": "Event Coordination Committee Member",
     "linkedin_url": "https://www.linkedin.com/in/krishnendu-mandal-264b31344",
     "email": "nendu.960@gmail.com",
     "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431602/Krishnendu_Mandal_m2sss7.jpg"
@@ -154,7 +154,7 @@
   {
     "id":20,
     "name": "Priyanshu Bhowal",
-    "role": "Event Coordination Commitee Member",
+    "role": "Event Coordination Committee Member",
     "linkedin_url": "https://www.linkedin.com/in/priyanshu-bhowal-a527982ba",
     "email": "priyanshubhowal030@gmail.com",
     "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431602/Priyanshu_Bhowal_ptt5gd.jpg"
@@ -162,7 +162,7 @@
   {
     "id":21,
     "name": "Suryadeep Mukherjee",
-    "role": "Event Coordination Commitee Member",
+    "role": "Event Coordination Committee Member",
     "linkedin_url": "https://www.linkedin.com/in/suryadeep-mukherjee-038a533b4",
     "email": "mukherjee.suryadeep6@gmail.com",
     "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431606/Suryadeep_Mukherjee_omuqhl.jpg"
@@ -170,7 +170,7 @@
   {
     "id":22,
     "name": "Swastick Chatterjee",
-    "role": "Event Coordination Commitee Member",
+    "role": "Event Coordination Committee Member",
     "linkedin_url": "https://www.linkedin.com/in/swastick-chatterjee-2832b539b",
     "email": "chatterjeeswastick@gmail.com",
     "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431607/Swastick_Chatterjee_t5l06i.jpg"
@@ -178,7 +178,7 @@
   {
     "id":23,
     "name": "Arya Chakraborty",
-    "role": "Event Coordination Commitee Member",
+    "role": "Event Coordination Committee Member",
     "linkedin_url": "https://in.linkedin.com/in/arya-chakraborty-62654a274",
     "email": "achakraborty.jpg@gmail.com",
     "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431598/Arya_Chakraborty_zhwtl6.jpg"
@@ -187,7 +187,7 @@
     "id":24,
     "name": "Dwaipayan Mukherjee",
     "role": "Technical Committee Head",
-    "linkedin_url": "https://linkedin.com/in/url",
+    "linkedin_url": "https://www.linkedin.com/",
     "email": "dwaipayanmukherjee100@gmail.com",
     "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431519/Dwaipayan_Mukherjee_hgdb10.jpg"
   },
@@ -267,8 +267,18 @@
     "id":34,
     "name": "Amit Das",
     "role": "PhD Scholar",
-    "linkedin_url": "https://linkedin.com/in/url",
+    "linkedin_url": "https://www.linkedin.com/",
     "email": "amit.rs@presiuniv.ac.in",
     "image": "https://res.cloudinary.com/dfrqqn5ry/image/upload/v1781431659/Amit_Das_wlmmdd.jpg"
+  },
+  {
+    "id":35,
+    "name": "Tithi Kirtania",
+    "role": "PR and Media Committee Member",
+    "linkedin_url": "https://www.linkedin.com/",
+    "email": "tithikirtania32@gmail.com",
+    "image": ""
   }
+
+
 ]

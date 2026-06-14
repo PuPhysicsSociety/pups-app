@@ -606,17 +606,17 @@ export default function TeamPage() {
           <div className="team-stats">
             <div className="team-stat">
               <span className="team-stat-n">{exec.length}</span>
-              <span className="team-stat-l">Executive</span>
+              <span className="team-stat-l">Core Committee</span>
             </div>
             <div className="team-stat-sep" />
             <div className="team-stat">
               <span className="team-stat-n">{nonExecNonPhd.length}</span>
-              <span className="team-stat-l">Committee</span>
+              <span className="team-stat-l">Sub Committee</span>
             </div>
             <div className="team-stat-sep" />
             <div className="team-stat">
               <span className="team-stat-n">{phd.length}</span>
-              <span className="team-stat-l">PhD Scholars</span>
+              <span className="team-stat-l">Academic Committee</span>
             </div>
             <div className="team-stat-sep" />
             <div className="team-stat">

@@ -206,7 +206,7 @@ img { max-width: 100%; display: block; }
 
 /* ── Colloquium grid ── */
 .coll-grid { display: grid; grid-template-columns: 1fr 1fr; }
-.coll-card { padding: 30px; border-top: 1px solid var(--rule); border-right: 1px solid var(--rule); transition: background .15s; cursor: pointer; text-decoration: none; color: var(--tx); display: block; }
+.coll-card { padding: 30px; border-top: 1px solid var(--rule); border-right: 1px solid var(--rule); transition: background .15s; cursor: pointer; text-decoration: none; color: var(--tx); display: flex; flex-direction: column; }
 .coll-card:nth-child(even) { border-right: 0; }
 .coll-card:nth-child(1), .coll-card:nth-child(2) { border-top-color: var(--tx4); }
 .coll-card:hover { background: var(--s1); }
@@ -386,7 +386,7 @@ site-footer { background: var(--s2); padding: 48px 0 32px; border-top: 1px solid
 .adm-signout:hover { color: var(--tx); background: var(--s1); }
 .adm-shell { display: grid; grid-template-columns: 188px 1fr; gap: 24px; align-items: start; }
 .adm-sidebar { border: 1px solid var(--rule); background: var(--s1); position: sticky; top: calc(var(--nav-h) + 14px); }
-.adm-tab { display: block; width: 100%; text-align: left; padding: 11px 16px; font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; background: none; border: 0; border-bottom: 1px solid var(--rule); cursor: pointer; color: var(--tx3); transition: all .12s; }
+.adm-tab { display: block; width: 100%; text-align: left; padding: 11px 16px; font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; background: none; border: 0; border-bottom: 1px solid var(--rule); color: var(--tx3); cursor: pointer; transition: background .12s, color .12s; }
 .adm-tab:last-child { border-bottom: 0; }
 .adm-tab.active { background: var(--cr); color: #fff8e8; }
 .adm-tab:hover:not(.active) { color: var(--tx); background: var(--s2); }
@@ -421,7 +421,7 @@ site-footer { background: var(--s2); padding: 48px 0 32px; border-top: 1px solid
 .adm-check input[type=checkbox] { width: 13px; height: 13px; accent-color: var(--cr); }
 .adm-sub { margin-top: 22px; }
 .adm-sub-lbl { font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--tx4); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.adm-add-btn { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .15em; text-transform: uppercase; padding: 4px 10px; border: 1px solid var(--rule); background: none; cursor: pointer; color: var(--tx4); transition: all .12s; }
+.adm-add-btn { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .15em; text-transform: uppercase; padding: 4px 10px; border: 1px solid var(--rule); background: none; cursor: pointer; color: var(--tx3); transition: background .12s; }
 .adm-add-btn:hover { color: var(--tx); background: var(--s2); }
 .adm-inline { display: flex; gap: 8px; margin-bottom: 7px; align-items: center; }
 .adm-inline .adm-input { flex: 1; }
@@ -431,10 +431,10 @@ site-footer { background: var(--s2); padding: 48px 0 32px; border-top: 1px solid
 .adm-row { display: flex; align-items: center; gap: 14px; padding: 13px 16px; background: var(--s1); border: 1px solid var(--rule); border-top: 0; }
 .adm-list > .adm-row:first-child { border-top: 1px solid var(--rule); }
 .adm-row-info { flex: 1; min-width: 0; }
-.adm-row-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-row-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: normal; word-wrap: break-word; line-height: 1.4; }
 .adm-row-meta { font-size: 9.5px; letter-spacing: .1em; color: var(--tx4); margin-top: 2px; }
 .adm-row-actions { display: flex; gap: 7px; flex-shrink: 0; }
-.adm-action { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; padding: 5px 11px; border: 1px solid var(--rule); background: none; cursor: pointer; color: var(--tx3); transition: all .12s; }
+.adm-action { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; padding: 5px 11px; border: 1px solid var(--rule); background: none; cursor: pointer; color: var(--tx3); transition: background .12s, color .12s; }
 .adm-action:hover { color: var(--tx); background: var(--s2); }
 .adm-action.del { border-color: rgba(140,28,28,.25); color: #8c1c1c; }
 .adm-action.del:hover { background: rgba(140,28,28,.06); }

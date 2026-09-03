@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import TeamMember from '@/lib/models/TeamMember';
-import { verifyAuth } from '@/lib/auth';
+import { verifyAuth, isAuthenticated } from '@/lib/auth';
 import { deleteCloudinaryAsset } from '@/lib/cloudinary';
 
 const dbReady = connectDB();
@@ -20,12 +20,15 @@ interface TeamMemberUpdateBody {
   order?: number;
 }
 
-export async function GET(_req: NextRequest, { params }: Context) {
+export async function GET(req: NextRequest, { params }: Context) {
   const { id } = await params;
   try {
     await dbReady;
     const item = await TeamMember.findById(id);
-    if (!item) {
+    // Treat an inactive member as not-found for anonymous visitors, same
+    // as the collection endpoint — no distinguishing "exists but hidden"
+    // response that would confirm a guessed ID belongs to a real record.
+    if (!item || (!item.active && !isAuthenticated(req))) {
       return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
     }
     return NextResponse.json({ success: true, data: item });

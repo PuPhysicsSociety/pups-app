@@ -108,23 +108,6 @@ export function normColloquium(raw: any) {
   };
 }
 
-export function normLectureSeries(raw: any) {
-  return {
-    id:              raw._id || raw.id || '',
-    title:           raw.title || '',
-    description:     raw.description || '',
-    thumbnail:       raw.thumbnail || '',
-    lecturerDetails: raw.lecturer_details || [],
-    dateTime:        raw.date_time || {},
-    mode:            raw.mode || 'offline',
-    noOfClasses:     raw.no_of_classes,
-    regFormLink:     raw.reg_form_link || '',
-    toContact:       raw.to_contact || [],
-    supplements:     raw.suppliments || [],
-    createdAt:       raw.createdAt || '',
-  };
-}
-
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export async function login(email: string, password: string) {
@@ -180,59 +163,6 @@ export async function updateColloquium(id: string, body: object) {
 export async function deleteColloquium(id: string) {
   const res = await fetch(`${API}/colloquia/${id}`, {
     method: 'DELETE', headers: authHeaders(),
-  });
-  return handleRes(res);
-}
-
-// ── Lecture Series ────────────────────────────────────────────────────────────
-
-export async function getLectureSeries(query?: string) {
-  const res = await fetch(`${API}/lecture-series${query || ''}`);
-  const data = await handleRes(res);
-  return { ...data, data: (data.data || []).map(normLectureSeries) };
-}
-
-export async function getLectureSeriesById(id: string) {
-  const res = await fetch(`${API}/lecture-series/${id}`);
-  const data = await handleRes(res);
-  return { ...data, data: normLectureSeries(data.data) };
-}
-
-export async function createLectureSeries(body: object) {
-  const res = await fetch(`${API}/lecture-series`, {
-    method: 'POST', headers: jsonHeaders(), body: JSON.stringify(body),
-  });
-  return handleRes(res);
-}
-
-export async function updateLectureSeries(id: string, body: object) {
-  const res = await fetch(`${API}/lecture-series/${id}`, {
-    method: 'PUT', headers: jsonHeaders(), body: JSON.stringify(body),
-  });
-  return handleRes(res);
-}
-
-export async function deleteLectureSeries(id: string) {
-  const res = await fetch(`${API}/lecture-series/${id}`, {
-    method: 'DELETE', headers: authHeaders(),
-  });
-  return handleRes(res);
-}
-
-export async function addLectureSeriesSupplement(id: string, payload: object) {
-  const res = await fetch(`${API}/lecture-series/${id}/suppliments`, {
-    method: 'POST',
-    headers: jsonHeaders(),
-    body: JSON.stringify(payload),
-  });
-  return handleRes(res);
-}
-
-export async function removeLectureSeriesSupplement(id: string, url: string) {
-  const res = await fetch(`${API}/lecture-series/${id}/suppliments`, {
-    method: 'DELETE',
-    headers: jsonHeaders(),
-    body: JSON.stringify({ url }),
   });
   return handleRes(res);
 }
@@ -351,7 +281,7 @@ export async function uploadFileToCloudinary(file: File, folder: string): Promis
 // ── Team ──────────────────────────────────────────────────────────────────────
 
 export async function getTeam(query?: string) {
-  const res = await fetch(`${API}/team${query || ''}`);
+  const res = await fetch(`${API}/team${query || ''}`, { headers: authHeaders() });
   return handleRes(res);
 }
 

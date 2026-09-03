@@ -5,16 +5,15 @@ import { verifyAuth } from '@/lib/auth';
 
 const dbReady = connectDB();
 
-export async function GET() {
-  console.log('[API EVENTS GET] Fetching all events');
+export async function GET(req: NextRequest) {
   try {
     await dbReady;
-    const items = await Event.find().sort({ 'date_time.start': -1 });
-    console.log(`[API EVENTS GET] Successfully retrieved ${items.length} events`);
+    const type = req.nextUrl.searchParams.get('type');
+    const filter = type ? { type } : {};
+    const items = await Event.find(filter).sort({ 'date_time.start': -1 });
     return NextResponse.json({ success: true, data: items });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
-    console.error('[API EVENTS GET] Error fetching events:', message);
     return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }

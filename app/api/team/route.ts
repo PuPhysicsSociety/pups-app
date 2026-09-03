@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import TeamMember from '@/lib/models/TeamMember';
-import { verifyAuth } from '@/lib/auth';
+import { verifyAuth, isAuthenticated } from '@/lib/auth';
 
 const dbReady = connectDB();
 
@@ -20,8 +20,13 @@ interface TeamMemberBody {
 export async function GET(req: NextRequest) {
   try {
     await dbReady;
-    const activeOnly = req.nextUrl.searchParams.get('active') === 'true';
-    const filter = activeOnly ? { active: true } : {};
+    // Anonymous visitors only ever get active members — inactive records
+    // (and any contact info on them) stay admin-only regardless of query
+    // params. A logged-in admin can still request active-only explicitly
+    // (e.g. to preview the public view).
+    const admin = isAuthenticated(req);
+    const wantsActiveOnly = req.nextUrl.searchParams.get('active') === 'true';
+    const filter = admin && !wantsActiveOnly ? {} : { active: true };
     const items = await TeamMember.find(filter).sort({ order: 1, createdAt: 1 });
     return NextResponse.json({ success: true, data: items });
   } catch (err: unknown) {

@@ -1,15 +1,15 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getLectureSeries } from '@/lib/api';
-import { LectureSeries } from '../../../types';
+import { getEvents } from '@/lib/api';
+import { UnifiedEvent } from '../../../types';
 
 export default function LectureSeriesPage() {
-  const [list, setList]     = useState<LectureSeries[]>([]);
+  const [list, setList]     = useState<UnifiedEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getLectureSeries()
+    getEvents('?type=lecture_series')
       .then(d => setList(d.data || []))
       .finally(() => setLoading(false));
   }, []);

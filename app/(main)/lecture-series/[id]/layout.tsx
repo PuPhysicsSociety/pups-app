@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { connectDB } from '@/lib/db';
-import LectureSeries from '@/lib/models/LectureSeries';
+import Event from '@/lib/models/Event';
 import React from 'react';
 
 type Props = {
@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   try {
     await connectDB();
-    const series = await LectureSeries.findById(id);
+    const series = await Event.findOne({ _id: id, type: 'lecture_series' });
     if (!series) return { title: 'Lecture Series Not Found | PUPS' };
     
     const title = `${series.title} | Lecture Series | Presidency University Physics Society`;

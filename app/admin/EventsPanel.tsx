@@ -4,6 +4,7 @@ import {
   getEvents, createEvent, updateEvent, deleteEvent,
   uploadToCloudinary, uploadFileToCloudinary,
 } from '../../lib/api';
+import { useSearchPage, AdminSearchBar, AdminPager } from './AdminListControls';
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -204,6 +205,12 @@ export default function EventsPanel() {
     if (!confirm('Delete event?')) return;
     try { await deleteEvent(id); load(); } catch { setErr('Delete failed'); }
   };
+
+  const { query, setQuery, page, setPage, pageCount, paged, total } = useSearchPage(
+    list,
+    (ev: any, q) => ev.title?.toLowerCase().includes(q) || (TYPE_LABELS[ev.type] || ev.type)?.toLowerCase().includes(q) || ev.mode?.toLowerCase().includes(q),
+    8
+  );
 
   const addLecturer = () => s('lecturers', [...(form.lecturers || []), { name: '', affiliation: '' }]);
   const addContact  = () => s('contacts',  [...(form.contacts  || []), { name: '', email: '', phone: '', role: '' }]);
@@ -426,32 +433,41 @@ export default function EventsPanel() {
         </form>
       )}
 
+      {!loading && list.length > 0 && (
+        <AdminSearchBar value={query} onChange={setQuery} placeholder="Search by title or type…" />
+      )}
+
       {loading ? (
         <div className="adm-empty">Loading…</div>
       ) : list.length === 0 ? (
         <div className="adm-empty">No events yet</div>
+      ) : total === 0 ? (
+        <div className="adm-empty">No events match your search</div>
       ) : (
-        <div className="adm-list">
-          {list.map(ev => (
-            <div key={ev.id} className="adm-row">
-              {ev.thumbnail && (
-                <img src={ev.thumbnail} alt="" className="adm-thumb"
-                  onError={e => (e.currentTarget.style.display = 'none')} />
-              )}
-              <div className="adm-row-info">
-                <div className="adm-row-title">{ev.title}</div>
-                <div className="adm-row-meta">
-                  {TYPE_LABELS[ev.type] || ev.type} · {ev.mode}
-                  {ev.dateTime?.schedule ? ` · ${ev.dateTime.schedule}` : ''}
+        <>
+          <div className="adm-list">
+            {paged.map(ev => (
+              <div key={ev.id} className="adm-row">
+                {ev.thumbnail && (
+                  <img src={ev.thumbnail} alt="" className="adm-thumb"
+                    onError={e => (e.currentTarget.style.display = 'none')} />
+                )}
+                <div className="adm-row-info">
+                  <div className="adm-row-title">{ev.title}</div>
+                  <div className="adm-row-meta">
+                    {TYPE_LABELS[ev.type] || ev.type} · {ev.mode}
+                    {ev.dateTime?.schedule ? ` · ${ev.dateTime.schedule}` : ''}
+                  </div>
+                </div>
+                <div className="adm-row-actions">
+                  <button className="adm-action" onClick={() => startEdit(ev)}>Edit</button>
+                  <button className="adm-action del" onClick={() => del(ev.id)}>Delete</button>
                 </div>
               </div>
-              <div className="adm-row-actions">
-                <button className="adm-action" onClick={() => startEdit(ev)}>Edit</button>
-                <button className="adm-action del" onClick={() => del(ev.id)}>Delete</button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          <AdminPager page={page} pageCount={pageCount} total={total} onChange={setPage} />
+        </>
       )}
     </div>
   );

@@ -29,3 +29,14 @@ export function verifyAuth(
     );
   }
 }
+
+/**
+ * Non-throwing, non-rejecting auth check for endpoints that serve both
+ * public and admin traffic (e.g. a public listing that should hide
+ * unpublished/inactive records from anonymous visitors, but show
+ * everything to a logged-in admin). Never returns a 401 — just tells the
+ * caller whether to apply the public-facing filter.
+ */
+export function isAuthenticated(req: NextRequest): boolean {
+  return !(verifyAuth(req) instanceof NextResponse);
+}

@@ -8,6 +8,7 @@ import {
   uploadToCloudinary, migrateTeam, reorderTeam,
 } from '../../lib/api';
 import EventsPanel from './EventsPanel';
+import { useSearchPage, AdminSearchBar, AdminPager } from './AdminListControls';
 
 // ── tiny helpers ──────────────────────────────────────────────────────────────
 
@@ -198,6 +199,12 @@ function ColloquiaPanel() {
     try { await deleteColloquium(id); load(); } catch { setErr('Delete failed'); }
   };
 
+  const { query, setQuery, page, setPage, pageCount, paged, total } = useSearchPage(
+    list,
+    (c: any, q) => c.name?.toLowerCase().includes(q) || c.speaker?.toLowerCase().includes(q) || c.department?.toLowerCase().includes(q),
+    8
+  );
+
   return (
     <div>
       <div className="adm-sec-head">
@@ -233,21 +240,28 @@ function ColloquiaPanel() {
         </form>
       )}
 
-      {loading ? <div className="adm-empty">Loading…</div> : list.length === 0 ? <div className="adm-empty">No colloquia yet</div> : (
-        <div className="adm-list">
-          {list.map(c => (
-            <div key={c.id} className="adm-row">
-              <div className="adm-row-info">
-                <div className="adm-row-title">{c.name}</div>
-                <div className="adm-row-meta">{c.date}{c.speaker ? ` · ${c.speaker}` : ''}{!c.published ? ' · Draft' : ''}</div>
+      {!loading && list.length > 0 && (
+        <AdminSearchBar value={query} onChange={setQuery} placeholder="Search by title, speaker, department…" />
+      )}
+
+      {loading ? <div className="adm-empty">Loading…</div> : list.length === 0 ? <div className="adm-empty">No colloquia yet</div> : total === 0 ? <div className="adm-empty">No colloquia match your search</div> : (
+        <>
+          <div className="adm-list">
+            {paged.map(c => (
+              <div key={c.id} className="adm-row">
+                <div className="adm-row-info">
+                  <div className="adm-row-title">{c.name}</div>
+                  <div className="adm-row-meta">{c.date}{c.speaker ? ` · ${c.speaker}` : ''}{!c.published ? ' · Draft' : ''}</div>
+                </div>
+                <div className="adm-row-actions">
+                  <button className="adm-action" onClick={() => startEdit(c)}>Edit</button>
+                  <button className="adm-action del" onClick={() => del(c.id)}>Delete</button>
+                </div>
               </div>
-              <div className="adm-row-actions">
-                <button className="adm-action" onClick={() => startEdit(c)}>Edit</button>
-                <button className="adm-action del" onClick={() => del(c.id)}>Delete</button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          <AdminPager page={page} pageCount={pageCount} total={total} onChange={setPage} />
+        </>
       )}
     </div>
   );
@@ -339,10 +353,39 @@ function TeamPanel() {
     }
   };
 
+  // Keyboard/touch-friendly alternative to dragging — native HTML5 drag
+  // and drop doesn't work on mobile, so this is the only way to reorder
+  // from a phone.
+  const moveItem = async (index: number, dir: -1 | 1) => {
+    const target = index + dir;
+    if (target < 0 || target >= list.length) return;
+    const reordered = [...list];
+    [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
+    const prev = list;
+    setList(reordered);
+    setReorderErr('');
+    try {
+      await reorderTeam(reordered.map(m => m.id));
+    } catch {
+      setList(prev);
+      setReorderErr('Reorder failed — please try again');
+    }
+  };
+
   const del = async (id: string) => {
     if (!confirm('Remove member?')) return;
     try { await deleteTeamMember(id); load(); } catch { setErr('Delete failed'); }
   };
+
+  // Reordering (drag or the up/down buttons) only makes sense against the
+  // full, unfiltered order — while searching, `filtered` is a subset, so
+  // dragging/moving within it can't be mapped back to a global order.
+  const { query, setQuery, paged: filtered, total } = useSearchPage(
+    list,
+    (m: any, q) => m.name?.toLowerCase().includes(q) || m.role?.toLowerCase().includes(q) || m.department?.toLowerCase().includes(q),
+    100000
+  );
+  const reorderEnabled = query.trim() === '';
 
   return (
     <div>
@@ -384,31 +427,64 @@ function TeamPanel() {
         </form>
       )}
 
-      {loading ? <div className="adm-empty">Loading…</div> : list.length === 0 ? <div className="adm-empty">No team members yet</div> : (
+      {!loading && list.length > 1 && (
+        <AdminSearchBar value={query} onChange={setQuery} placeholder="Search by name, role, department…" />
+      )}
+
+      {loading ? <div className="adm-empty">Loading…</div> : list.length === 0 ? <div className="adm-empty">No team members yet</div> : total === 0 ? <div className="adm-empty">No members match your search</div> : (
         <>
-          {list.length > 1 && (
+          {reorderEnabled && list.length > 1 && (
             <div style={{ fontSize: 11, color: 'var(--tx4)', margin: '4px 0 10px' }}>
-              Drag <span style={{ color: 'var(--tx3)' }}>⠿</span> to reorder how members appear on the public team page.
+              Drag <span style={{ color: 'var(--tx3)' }}>⠿</span> (or use the arrows on mobile) to reorder how members appear on the public team page.
+            </div>
+          )}
+          {!reorderEnabled && (
+            <div style={{ fontSize: 11, color: 'var(--tx4)', margin: '4px 0 10px' }}>
+              Clear the search to reorder members.
             </div>
           )}
           {reorderErr && <div style={{ fontSize: 11, color: '#c0392b', marginBottom: 10 }}>{reorderErr}</div>}
           <div className="adm-list">
-            {list.map((m, i) => (
+            {filtered.map((m, i) => (
               <div
                 key={m.id}
                 className="adm-row"
-                draggable
-                onDragStart={onDragStart(i)}
-                onDragOver={onDragOver(i)}
-                onDrop={onDrop(i)}
-                onDragEnd={onDragEnd}
+                draggable={reorderEnabled}
+                onDragStart={reorderEnabled ? onDragStart(i) : undefined}
+                onDragOver={reorderEnabled ? onDragOver(i) : undefined}
+                onDrop={reorderEnabled ? onDrop(i) : undefined}
+                onDragEnd={reorderEnabled ? onDragEnd : undefined}
                 style={{
                   opacity: dragIndex === i ? 0.4 : 1,
                   borderTop: overIndex === i && dragIndex !== null && dragIndex !== i ? '2px solid var(--tx2)' : undefined,
-                  cursor: 'grab',
+                  cursor: reorderEnabled ? 'grab' : 'default',
                 }}
               >
-                <span style={{ color: 'var(--tx4)', fontSize: 14, marginRight: 4, cursor: 'grab', flexShrink: 0 }} title="Drag to reorder">⠿</span>
+                {reorderEnabled && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginRight: 4, flexShrink: 0 }}>
+                    <span style={{ color: 'var(--tx4)', fontSize: 14, cursor: 'grab', textAlign: 'center' }} title="Drag to reorder">⠿</span>
+                    <div style={{ display: 'flex', gap: 2 }}>
+                      <button
+                        type="button"
+                        className="adm-action"
+                        style={{ padding: '0 4px', fontSize: 10, lineHeight: '16px' }}
+                        disabled={i === 0}
+                        onClick={() => moveItem(i, -1)}
+                        title="Move up"
+                        aria-label={`Move ${m.name} up`}
+                      >↑</button>
+                      <button
+                        type="button"
+                        className="adm-action"
+                        style={{ padding: '0 4px', fontSize: 10, lineHeight: '16px' }}
+                        disabled={i === filtered.length - 1}
+                        onClick={() => moveItem(i, 1)}
+                        title="Move down"
+                        aria-label={`Move ${m.name} down`}
+                      >↓</button>
+                    </div>
+                  </div>
+                )}
                 <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--s2)', border: '1px solid var(--rule)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {m.photo ? <img src={getImageUrl(m.photo)} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 11, color: 'var(--tx4)' }}>{(m.name || '?').trim().split(/\s+/).map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}</span>}
                 </div>

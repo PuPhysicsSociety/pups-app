@@ -2,7 +2,6 @@ import { MetadataRoute } from 'next';
 import { connectDB } from '@/lib/db';
 import Event from '@/lib/models/Event';
 import Colloquium from '@/lib/models/Colloquium';
-import LectureSeries from '@/lib/models/LectureSeries';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://puphysicssociety.vercel.app';
@@ -50,8 +49,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     });
 
-    // 3. Fetch Lecture Series
-    const lectureSeries = await LectureSeries.find({}, '_id updatedAt').lean();
+    // 3. Fetch Lecture Series (now stored as Events with type "lecture_series")
+    const lectureSeries = await Event.find({ type: 'lecture_series' }, '_id updatedAt').lean();
     lectureSeries.forEach((series: any) => {
       sitemapEntries.push({
         url: `${baseUrl}/lecture-series/${series._id}`,

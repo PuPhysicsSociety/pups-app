@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getLectureSeriesById, getImageUrl } from '@/lib/api';
-import { LectureSeries } from '../../../../types';
+import { getEventById, getImageUrl } from '@/lib/api';
+import { UnifiedEvent } from '../../../../types';
 
 const T = {
   tx:    'var(--tx,   #1f1b16)',
@@ -53,14 +53,14 @@ function Label({ children }: { children: React.ReactNode }) {
 
 export default function LectureSeriesDetail() {
   const { id } = useParams() as { id: string };
-  const [entry, setEntry] = useState<LectureSeries | null>(null);
+  const [entry, setEntry] = useState<UnifiedEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFoundFlag, setNotFoundFlag] = useState(false);
   const [imgIdx, setImgIdx] = useState(0);
 
   useEffect(() => {
     if (!id) return;
-    getLectureSeriesById(id)
+    getEventById(id)
       .then(d => setEntry(d.data))
       .catch(() => setNotFoundFlag(true))
       .finally(() => setLoading(false));

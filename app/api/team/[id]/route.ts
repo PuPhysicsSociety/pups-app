@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import TeamMember from '@/lib/models/TeamMember';
 import { verifyAuth } from '@/lib/auth';
+import { deleteCloudinaryAsset } from '@/lib/cloudinary';
 
 const dbReady = connectDB();
 
@@ -42,6 +43,19 @@ export async function PUT(req: NextRequest, { params }: Context) {
   try {
     await dbReady;
     const body: TeamMemberUpdateBody = await req.json();
+
+    // If the photo is being replaced or explicitly cleared, delete the old
+    // Cloudinary asset so it doesn't sit around unused. Only fires when
+    // `photo` is actually present in the body and differs from what's
+    // stored — omitting the key entirely (e.g. editing just the bio) never
+    // touches the photo.
+    if (typeof body.photo === 'string') {
+      const existing = await TeamMember.findById(id).select('photo').lean();
+      if (existing?.photo && existing.photo !== body.photo) {
+        await deleteCloudinaryAsset(existing.photo);
+      }
+    }
+
     const item = await TeamMember.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
@@ -67,6 +81,7 @@ export async function DELETE(req: NextRequest, { params }: Context) {
     if (!item) {
       return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
     }
+    if (item.photo) await deleteCloudinaryAsset(item.photo);
     return NextResponse.json({ success: true, message: 'Deleted successfully' });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';

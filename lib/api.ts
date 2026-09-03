@@ -381,6 +381,13 @@ export async function deleteTeamMember(id: string) {
   return handleRes(res);
 }
 
+export async function reorderTeam(ids: string[]) {
+  const res = await fetch(`${API}/team/reorder`, {
+    method: 'POST', headers: jsonHeaders(), body: JSON.stringify({ ids }),
+  });
+  return handleRes(res);
+}
+
 export async function migrateTeam() {
   const res = await fetch(`${API}/admin/migrate-team`, {
     method: 'POST', headers: authHeaders(),

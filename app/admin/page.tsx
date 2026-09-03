@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
   getColloquium, createColloquium, updateColloquium, deleteColloquium,
   getTeam, createTeamMember, updateTeamMember, deleteTeamMember, getImageUrl,
-  uploadToCloudinary, migrateTeam,
+  uploadToCloudinary, migrateTeam, reorderTeam,
 } from '../../lib/api';
 import EventsPanel from './EventsPanel';
 
@@ -263,6 +263,7 @@ function TeamPanel() {
   const [form, setForm] = useState<any>({ ...TM_EMPTY });
   const [editId, setEditId] = useState<string | null>(null);
   const [photo, setPhoto] = useState<File | null>(null);
+  const [removePhoto, setRemovePhoto] = useState(false);
   const [busy, setBusy] = useState(false);
   const [ok, setOk] = useState('');
   const [err, setErr] = useState('');
@@ -275,11 +276,11 @@ function TeamPanel() {
   useEffect(load, []);
 
   const s = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }));
-  const reset = () => { setForm({ ...TM_EMPTY }); setEditId(null); setPhoto(null); setOpen(false); setErr(''); };
+  const reset = () => { setForm({ ...TM_EMPTY }); setEditId(null); setPhoto(null); setRemovePhoto(false); setOpen(false); setErr(''); };
 
   const startEdit = (m: any) => {
     setForm({ name: m.name, role: m.role, email: m.email || '', bio: m.bio || '', linkedin_url: m.linkedin_url || '', department: m.department || '', active: m.active ?? true, existingPhoto: m.photo || '' });
-    setEditId(m.id); setOpen(true); window.scrollTo({ top: 0, behavior: 'smooth' });
+    setEditId(m.id); setPhoto(null); setRemovePhoto(false); setOpen(true); window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -293,12 +294,49 @@ function TeamPanel() {
         linkedin_url: form.linkedin_url || undefined, department: form.department || undefined,
         active: form.active,
       };
-      if (photoUrl) body.photo = photoUrl;
+      if (photo) body.photo = photoUrl;
+      else if (removePhoto) body.photo = '';
       if (editId) { await updateTeamMember(editId, body); setOk('Updated'); }
       else        { await createTeamMember(body);          setOk('Added'); }
       setTimeout(() => setOk(''), 3000); reset(); load();
     } catch (ex: any) { setErr(ex.message || 'Save failed'); }
     finally { setBusy(false); }
+  };
+
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
+  const [reorderErr, setReorderErr] = useState('');
+
+  const onDragStart = (index: number) => (e: React.DragEvent) => {
+    setDragIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const onDragOver = (index: number) => (e: React.DragEvent) => {
+    e.preventDefault();
+    if (index !== overIndex) setOverIndex(index);
+  };
+
+  const onDragEnd = () => { setDragIndex(null); setOverIndex(null); };
+
+  const onDrop = (index: number) => async (e: React.DragEvent) => {
+    e.preventDefault();
+    onDragEnd();
+    if (dragIndex === null || dragIndex === index) return;
+
+    const reordered = [...list];
+    const [moved] = reordered.splice(dragIndex, 1);
+    reordered.splice(index, 0, moved);
+
+    const prev = list;
+    setList(reordered); // optimistic
+    setReorderErr('');
+    try {
+      await reorderTeam(reordered.map(m => m.id));
+    } catch {
+      setList(prev); // revert on failure
+      setReorderErr('Reorder failed — please try again');
+    }
   };
 
   const del = async (id: string) => {
@@ -325,7 +363,15 @@ function TeamPanel() {
             <AField label="Email"><input type="email" className="adm-input" value={form.email} onChange={e => s('email', e.target.value)} /></AField>
             <AField label="LinkedIn URL"><input type="url" className="adm-input" value={form.linkedin_url} onChange={e => s('linkedin_url', e.target.value)} /></AField>
             <AField label="Department"><input className="adm-input" value={form.department} onChange={e => s('department', e.target.value)} /></AField>
-            <AField label="Photo"><input type="file" accept="image/*" className="adm-file-input" onChange={e => setPhoto(e.target.files?.[0] || null)} /></AField>
+            <AField label="Photo">
+              <input type="file" accept="image/*" className="adm-file-input" onChange={e => { setPhoto(e.target.files?.[0] || null); if (e.target.files?.[0]) setRemovePhoto(false); }} />
+              {editId && form.existingPhoto && !photo && (
+                <label className="adm-check" style={{ marginTop: 6 }}>
+                  <input type="checkbox" checked={removePhoto} onChange={e => setRemovePhoto(e.target.checked)} />
+                  Remove current photo
+                </label>
+              )}
+            </AField>
             <AField label="Bio" col2><textarea rows={3} className="adm-textarea" value={form.bio} onChange={e => s('bio', e.target.value)} /></AField>
           </div>
           <div className="adm-check-row">
@@ -339,23 +385,45 @@ function TeamPanel() {
       )}
 
       {loading ? <div className="adm-empty">Loading…</div> : list.length === 0 ? <div className="adm-empty">No team members yet</div> : (
-        <div className="adm-list">
-          {list.map(m => (
-            <div key={m.id} className="adm-row">
-              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--s2)', border: '1px solid var(--rule)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {m.photo ? <img src={getImageUrl(m.photo)} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 11, color: 'var(--tx4)' }}>{(m.name || '?').trim().split(/\s+/).map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}</span>}
-              </div>
-              <div className="adm-row-info">
-                <div className="adm-row-title">{m.name}</div>
-                <div className="adm-row-meta">{m.role}{m.department ? ` · ${m.department}` : ''}{!m.active ? ' · Inactive' : ''}</div>
-              </div>
-              <div className="adm-row-actions">
-                <button className="adm-action" onClick={() => startEdit(m)}>Edit</button>
-                <button className="adm-action del" onClick={() => del(m.id)}>Remove</button>
-              </div>
+        <>
+          {list.length > 1 && (
+            <div style={{ fontSize: 11, color: 'var(--tx4)', margin: '4px 0 10px' }}>
+              Drag <span style={{ color: 'var(--tx3)' }}>⠿</span> to reorder how members appear on the public team page.
             </div>
-          ))}
-        </div>
+          )}
+          {reorderErr && <div style={{ fontSize: 11, color: '#c0392b', marginBottom: 10 }}>{reorderErr}</div>}
+          <div className="adm-list">
+            {list.map((m, i) => (
+              <div
+                key={m.id}
+                className="adm-row"
+                draggable
+                onDragStart={onDragStart(i)}
+                onDragOver={onDragOver(i)}
+                onDrop={onDrop(i)}
+                onDragEnd={onDragEnd}
+                style={{
+                  opacity: dragIndex === i ? 0.4 : 1,
+                  borderTop: overIndex === i && dragIndex !== null && dragIndex !== i ? '2px solid var(--tx2)' : undefined,
+                  cursor: 'grab',
+                }}
+              >
+                <span style={{ color: 'var(--tx4)', fontSize: 14, marginRight: 4, cursor: 'grab', flexShrink: 0 }} title="Drag to reorder">⠿</span>
+                <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--s2)', border: '1px solid var(--rule)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {m.photo ? <img src={getImageUrl(m.photo)} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 11, color: 'var(--tx4)' }}>{(m.name || '?').trim().split(/\s+/).map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}</span>}
+                </div>
+                <div className="adm-row-info">
+                  <div className="adm-row-title">{m.name}</div>
+                  <div className="adm-row-meta">{m.role}{m.department ? ` · ${m.department}` : ''}{!m.active ? ' · Inactive' : ''}</div>
+                </div>
+                <div className="adm-row-actions">
+                  <button className="adm-action" onClick={() => startEdit(m)}>Edit</button>
+                  <button className="adm-action del" onClick={() => del(m.id)}>Remove</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

@@ -360,16 +360,16 @@ export async function getTeamById(id: string) {
   return handleRes(res);
 }
 
-export async function createTeamMember(formData: FormData) {
+export async function createTeamMember(body: Record<string, unknown>) {
   const res = await fetch(`${API}/team`, {
-    method: 'POST', headers: authHeaders(), body: formData,
+    method: 'POST', headers: jsonHeaders(), body: JSON.stringify(body),
   });
   return handleRes(res);
 }
 
-export async function updateTeamMember(id: string, formData: FormData) {
+export async function updateTeamMember(id: string, body: Record<string, unknown>) {
   const res = await fetch(`${API}/team/${id}`, {
-    method: 'PUT', headers: authHeaders(), body: formData,
+    method: 'PUT', headers: jsonHeaders(), body: JSON.stringify(body),
   });
   return handleRes(res);
 }
@@ -377,6 +377,13 @@ export async function updateTeamMember(id: string, formData: FormData) {
 export async function deleteTeamMember(id: string) {
   const res = await fetch(`${API}/team/${id}`, {
     method: 'DELETE', headers: authHeaders(),
+  });
+  return handleRes(res);
+}
+
+export async function migrateTeam() {
+  const res = await fetch(`${API}/admin/migrate-team`, {
+    method: 'POST', headers: authHeaders(),
   });
   return handleRes(res);
 }

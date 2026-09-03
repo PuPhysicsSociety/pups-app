@@ -1,16 +1,37 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Linkedin, Mail, User, ChevronDown, ChevronUp } from 'lucide-react';
-import teamData from '../../../data/team.json';
+import { getTeam, getImageUrl } from '../../../lib/api';
 
 /* ── Types ── */
 interface TeamMember {
-  id: number;
+  id: string;
   name: string;
   role: string;
   linkedin_url?: string;
   email?: string;
   image?: string;
+}
+
+// A few legacy records carry this literal placeholder instead of a real
+// profile URL — never render it as a working link.
+const PLACEHOLDER_LINKEDIN = new Set([
+  'https://www.linkedin.com/',
+  'http://www.linkedin.com/',
+  'https://www.linkedin.com',
+  'http://www.linkedin.com',
+]);
+
+function normalize(raw: any): TeamMember {
+  const linkedin = raw.linkedin_url?.trim();
+  return {
+    id: raw._id || raw.id,
+    name: (raw.name || 'Unnamed').trim(),
+    role: (raw.role || 'Member').trim(),
+    linkedin_url: linkedin && !PLACEHOLDER_LINKEDIN.has(linkedin) ? linkedin : undefined,
+    email: raw.email?.trim() || undefined,
+    image: raw.photo ? getImageUrl(raw.photo) : undefined,
+  };
 }
 
 /* ── Classification ── */
@@ -208,7 +229,41 @@ function groupByCommittee(members: TeamMember[]) {
 
 /* ── Page ── */
 export default function TeamPage() {
-  const members = teamData as TeamMember[];
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState(false);
+
+  useEffect(() => {
+    getTeam('?active=true')
+      .then(d => setMembers((d.data || []).map(normalize)))
+      .catch(() => setErr(true))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="team-hero">
+        <div className="wrap">
+          <div className="team-hero-kicker">Society · Est. 2025</div>
+          <h1 className="team-hero-h1">Loading team&hellip;</h1>
+        </div>
+      </section>
+    );
+  }
+
+  if (err || members.length === 0) {
+    return (
+      <section className="team-hero">
+        <div className="wrap">
+          <div className="team-hero-kicker">Society · Est. 2025</div>
+          <h1 className="team-hero-h1">The people <em>behind</em><br />the society.</h1>
+          <p className="team-hero-lede">
+            {err ? 'Team data is temporarily unavailable — please check back shortly.' : 'No team members published yet.'}
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   const exec    = members.filter(m => classify(m) === 'exec');
   const heads   = members.filter(m => classify(m) === 'head');

@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
   getColloquium, createColloquium, updateColloquium, deleteColloquium,
   getTeam, createTeamMember, updateTeamMember, deleteTeamMember, getImageUrl,
-  uploadToCloudinary,
+  uploadToCloudinary, migrateTeam,
 } from '../../lib/api';
 import EventsPanel from './EventsPanel';
 
@@ -41,6 +41,8 @@ function OverviewPanel({ onTab }: { onTab: (t: string) => void }) {
   const { user } = useAuth();
   const [migrating, setMigrating] = useState(false);
   const [migrateMsg, setMigrateMsg] = useState('');
+  const [teamMigrating, setTeamMigrating] = useState(false);
+  const [teamMigrateMsg, setTeamMigrateMsg] = useState('');
 
   const runMigration = async () => {
     if (!confirm('This will migrate existing LectureSeries and Workshop data into the unified Events collection. Safe to run multiple times (skips duplicates). Continue?')) return;
@@ -62,6 +64,24 @@ function OverviewPanel({ onTab }: { onTab: (t: string) => void }) {
       setMigrateMsg(`Error: ${e.message}`);
     } finally {
       setMigrating(false);
+    }
+  };
+
+  const runTeamMigration = async () => {
+    if (!confirm('This will import existing team.json members into the database. Safe to run multiple times (skips duplicates by name + role). Continue?')) return;
+    setTeamMigrating(true);
+    setTeamMigrateMsg('');
+    try {
+      const data = await migrateTeam();
+      if (data.success) {
+        setTeamMigrateMsg(`✓ Migrated: ${data.migrated}, Skipped (already exist): ${data.skipped}${data.errors?.length ? `, Errors: ${data.errors.join('; ')}` : ''}`);
+      } else {
+        setTeamMigrateMsg(`Error: ${data.message}`);
+      }
+    } catch (e: any) {
+      setTeamMigrateMsg(`Error: ${e.message}`);
+    } finally {
+      setTeamMigrating(false);
     }
   };
 
@@ -93,6 +113,23 @@ function OverviewPanel({ onTab }: { onTab: (t: string) => void }) {
         </button>
         {migrateMsg && (
           <div style={{ marginTop: 12, fontSize: 11, color: 'var(--tx3)', lineHeight: 1.7 }}>{migrateMsg}</div>
+        )}
+      </div>
+
+      {/* Team migration tool */}
+      <div style={{ border: '1px solid var(--rule)', padding: '22px 24px', marginTop: 24 }}>
+        <div style={{ fontSize: 9.5, letterSpacing: '.2em', textTransform: 'uppercase', color: 'var(--tx4)', marginBottom: 8 }}>
+          Team Data Migration
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--tx3)', marginBottom: 14, lineHeight: 1.7 }}>
+          Import existing team.json members into the database so they can be managed here.
+          Safe to run multiple times — duplicates (matched by name + role) are skipped.
+        </p>
+        <button className="adm-btn" onClick={runTeamMigration} disabled={teamMigrating}>
+          {teamMigrating ? 'Migrating…' : 'Run Team Migration'}
+        </button>
+        {teamMigrateMsg && (
+          <div style={{ marginTop: 12, fontSize: 11, color: 'var(--tx3)', lineHeight: 1.7 }}>{teamMigrateMsg}</div>
         )}
       </div>
     </div>
@@ -218,7 +255,7 @@ function ColloquiaPanel() {
 
 // ── Team ──────────────────────────────────────────────────────────────────────
 
-const TM_EMPTY = { name: '', role: '', email: '', bio: '', linkedin_url: '', department: '', active: true };
+const TM_EMPTY = { name: '', role: '', email: '', bio: '', linkedin_url: '', department: '', active: true, existingPhoto: '' };
 
 function TeamPanel() {
   const [list, setList] = useState<any[]>([]);
@@ -241,19 +278,24 @@ function TeamPanel() {
   const reset = () => { setForm({ ...TM_EMPTY }); setEditId(null); setPhoto(null); setOpen(false); setErr(''); };
 
   const startEdit = (m: any) => {
-    setForm({ name: m.name, role: m.role, email: m.email || '', bio: m.bio || '', linkedin_url: m.linkedin_url || '', department: m.department || '', active: m.active ?? true });
+    setForm({ name: m.name, role: m.role, email: m.email || '', bio: m.bio || '', linkedin_url: m.linkedin_url || '', department: m.department || '', active: m.active ?? true, existingPhoto: m.photo || '' });
     setEditId(m.id); setOpen(true); window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setBusy(true); setErr('');
     try {
-      const fd = new FormData();
-      (['name', 'role', 'email', 'bio', 'linkedin_url', 'department'] as const).forEach(k => fd.append(k, String((form as any)[k] || '')));
-      fd.append('active', String(form.active));
-      if (photo) fd.append('photo', photo);
-      if (editId) { await updateTeamMember(editId, fd); setOk('Updated'); }
-      else        { await createTeamMember(fd);           setOk('Added'); }
+      let photoUrl = form.existingPhoto || undefined;
+      if (photo) photoUrl = await uploadToCloudinary(photo, 'physics-society/team/photos');
+      const body: any = {
+        name: form.name, role: form.role,
+        email: form.email || undefined, bio: form.bio || undefined,
+        linkedin_url: form.linkedin_url || undefined, department: form.department || undefined,
+        active: form.active,
+      };
+      if (photoUrl) body.photo = photoUrl;
+      if (editId) { await updateTeamMember(editId, body); setOk('Updated'); }
+      else        { await createTeamMember(body);          setOk('Added'); }
       setTimeout(() => setOk(''), 3000); reset(); load();
     } catch (ex: any) { setErr(ex.message || 'Save failed'); }
     finally { setBusy(false); }
@@ -268,7 +310,7 @@ function TeamPanel() {
     <div>
       <div className="adm-sec-head">
         <div className="adm-h">Team</div>
-        <button disabled={true} className={`adm-btn ${open && !editId ? 'ghost' : ''}`} onClick={() => { reset(); setOpen(o => !o); }}>
+        <button className={`adm-btn ${open && !editId ? 'ghost' : ''}`} onClick={() => { reset(); setOpen(o => !o); }}>
           {open && !editId ? '✕ Cancel' : '+ Add Member'}
         </button>
       </div>
@@ -301,7 +343,7 @@ function TeamPanel() {
           {list.map(m => (
             <div key={m.id} className="adm-row">
               <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--s2)', border: '1px solid var(--rule)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {m.photo ? <img src={getImageUrl(m.photo)} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 11, color: 'var(--tx4)' }}>{m.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}</span>}
+                {m.photo ? <img src={getImageUrl(m.photo)} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 11, color: 'var(--tx4)' }}>{(m.name || '?').trim().split(/\s+/).map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}</span>}
               </div>
               <div className="adm-row-info">
                 <div className="adm-row-title">{m.name}</div>
@@ -328,10 +370,18 @@ const TABS = [
   { id: 'team',      label: 'Team' },
 ];
 
+const VALID_TAB_IDS = new Set(TABS.map(t => t.id));
+
 export default function AdminPage() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [tab, setTab] = useState('overview');
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const requested = new URLSearchParams(window.location.search).get('tab');
+    if (requested && VALID_TAB_IDS.has(requested)) setTab(requested);
+  }, []);
 
   return (
     <div className="adm-wrap">

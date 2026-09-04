@@ -8,6 +8,7 @@ import {
   uploadToCloudinary, migrateTeam, reorderTeam,
 } from '../../lib/api';
 import EventsPanel from './EventsPanel';
+import PagesPanel from './PagesPanel';
 import { useSearchPage, AdminSearchBar, AdminPager } from './AdminListControls';
 
 // ── tiny helpers ──────────────────────────────────────────────────────────────
@@ -512,6 +513,7 @@ const TABS = [
   { id: 'events',    label: 'Events' },
   { id: 'colloquia', label: 'Colloquia' },
   { id: 'team',      label: 'Team' },
+  { id: 'pages',     label: 'Pages' },
 ];
 
 const VALID_TAB_IDS = new Set(TABS.map(t => t.id));
@@ -554,6 +556,7 @@ export default function AdminPage() {
           {tab === 'events'    && <EventsPanel />}
           {tab === 'colloquia' && <ColloquiaPanel />}
           {tab === 'team'      && <TeamPanel />}
+          {tab === 'pages'     && <PagesPanel />}
         </div>
       </div>
     </div>

@@ -108,6 +108,27 @@ export function normColloquium(raw: any) {
   };
 }
 
+// ── Site Content (Home / About / Contact) ──────────────────────────────────────
+
+export async function getSiteContent(page: 'home' | 'about' | 'contact') {
+  const res = await fetch(`${API}/site-content/${page}`);
+  return handleRes(res);
+}
+
+export async function updateSiteContent(page: 'home' | 'about' | 'contact', data: object) {
+  const res = await fetch(`${API}/site-content/${page}`, {
+    method: 'PUT', headers: jsonHeaders(), body: JSON.stringify(data),
+  });
+  return handleRes(res);
+}
+
+export async function resetSiteContent(page: 'home' | 'about' | 'contact') {
+  const res = await fetch(`${API}/site-content/${page}`, {
+    method: 'DELETE', headers: authHeaders(),
+  });
+  return handleRes(res);
+}
+
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export async function login(email: string, password: string) {

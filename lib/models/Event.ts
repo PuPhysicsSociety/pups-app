@@ -73,6 +73,9 @@ const eventSchema = new mongoose.Schema(
     audience: String,
     duration: String,
     tags:     [String],
+
+    // Soft delete — see TeamMember.ts for the same pattern/rationale.
+    deletedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

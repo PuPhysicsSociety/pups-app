@@ -156,7 +156,7 @@ export async function register(name: string, email: string, password: string) {
 // ── Colloquia ─────────────────────────────────────────────────────────────────
 
 export async function getColloquium(query?: string) {
-  const res = await fetch(`${API}/colloquia${query || ''}`);
+  const res = await fetch(`${API}/colloquia${query || ''}`, { headers: authHeaders() });
   const data = await handleRes(res);
   return { ...data, data: (data.data || []).map(normColloquium) };
 }
@@ -183,6 +183,20 @@ export async function updateColloquium(id: string, body: object) {
 
 export async function deleteColloquium(id: string) {
   const res = await fetch(`${API}/colloquia/${id}`, {
+    method: 'DELETE', headers: authHeaders(),
+  });
+  return handleRes(res);
+}
+
+export async function restoreColloquium(id: string) {
+  const res = await fetch(`${API}/colloquia/${id}/restore`, {
+    method: 'POST', headers: authHeaders(),
+  });
+  return handleRes(res);
+}
+
+export async function permanentlyDeleteColloquium(id: string) {
+  const res = await fetch(`${API}/colloquia/${id}/permanent`, {
     method: 'DELETE', headers: authHeaders(),
   });
   return handleRes(res);
@@ -216,7 +230,7 @@ export function normEvent(raw: any) {
 }
 
 export async function getEvents(query?: string) {
-  const res = await fetch(`${API}/events${query || ''}`);
+  const res = await fetch(`${API}/events${query || ''}`, { headers: authHeaders() });
   const data = await handleRes(res);
   return { ...data, data: (data.data || []).map(normEvent) };
 }
@@ -243,6 +257,20 @@ export async function updateEvent(id: string, body: object) {
 
 export async function deleteEvent(id: string) {
   const res = await fetch(`${API}/events/${id}`, {
+    method: 'DELETE', headers: authHeaders(),
+  });
+  return handleRes(res);
+}
+
+export async function restoreEvent(id: string) {
+  const res = await fetch(`${API}/events/${id}/restore`, {
+    method: 'POST', headers: authHeaders(),
+  });
+  return handleRes(res);
+}
+
+export async function permanentlyDeleteEvent(id: string) {
+  const res = await fetch(`${API}/events/${id}/permanent`, {
     method: 'DELETE', headers: authHeaders(),
   });
   return handleRes(res);
@@ -327,6 +355,20 @@ export async function updateTeamMember(id: string, body: Record<string, unknown>
 
 export async function deleteTeamMember(id: string) {
   const res = await fetch(`${API}/team/${id}`, {
+    method: 'DELETE', headers: authHeaders(),
+  });
+  return handleRes(res);
+}
+
+export async function restoreTeamMember(id: string) {
+  const res = await fetch(`${API}/team/${id}/restore`, {
+    method: 'POST', headers: authHeaders(),
+  });
+  return handleRes(res);
+}
+
+export async function permanentlyDeleteTeamMember(id: string) {
+  const res = await fetch(`${API}/team/${id}/permanent`, {
     method: 'DELETE', headers: authHeaders(),
   });
   return handleRes(res);

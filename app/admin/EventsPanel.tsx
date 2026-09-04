@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import {
   getEvents, createEvent, updateEvent, deleteEvent,
+  restoreEvent, permanentlyDeleteEvent,
   uploadToCloudinary, uploadFileToCloudinary,
 } from '../../lib/api';
-import { useSearchPage, AdminSearchBar, AdminPager } from './AdminListControls';
+import { useSearchPage, AdminSearchBar, AdminPager, TrashToggle, TrashList } from './AdminListControls';
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -202,8 +203,29 @@ export default function EventsPanel() {
   };
 
   const del = async (id: string) => {
-    if (!confirm('Delete event?')) return;
+    if (!confirm('Move this event to trash? You can restore it later from the Trash view.')) return;
     try { await deleteEvent(id); load(); } catch { setErr('Delete failed'); }
+  };
+
+  const [showTrash, setShowTrash] = useState(false);
+  const [trash, setTrash] = useState<any[]>([]);
+  const [trashLoading, setTrashLoading] = useState(false);
+
+  const loadTrash = () => {
+    setTrashLoading(true);
+    getEvents('?trashed=true').then(d => setTrash(d.data || [])).catch(() => setErr('Failed to load trash')).finally(() => setTrashLoading(false));
+  };
+  const toggleTrash = () => {
+    const next = !showTrash;
+    setShowTrash(next);
+    if (next) loadTrash();
+  };
+  const restore = async (id: string) => {
+    try { await restoreEvent(id); loadTrash(); load(); } catch { setErr('Restore failed'); }
+  };
+  const permaDel = async (id: string) => {
+    if (!confirm('Permanently delete this event? This cannot be undone.')) return;
+    try { await permanentlyDeleteEvent(id); loadTrash(); } catch { setErr('Delete failed'); }
   };
 
   const { query, setQuery, page, setPage, pageCount, paged, total } = useSearchPage(
@@ -219,15 +241,32 @@ export default function EventsPanel() {
     <div>
       <div className="adm-sec-head">
         <div className="adm-h">Events</div>
-        <button
-          className={`adm-btn ${open && !editId ? 'ghost' : ''}`}
-          onClick={() => { reset(); setOpen(o => !o); }}
-        >
-          {open && !editId ? '✕ Cancel' : '+ New Event'}
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <TrashToggle showing={showTrash} onToggle={toggleTrash} />
+          {!showTrash && (
+            <button
+              className={`adm-btn ${open && !editId ? 'ghost' : ''}`}
+              onClick={() => { reset(); setOpen(o => !o); }}
+            >
+              {open && !editId ? '✕ Cancel' : '+ New Event'}
+            </button>
+          )}
+        </div>
       </div>
       <Msg ok={ok} err={err} />
 
+      {showTrash ? (
+        <TrashList
+          items={trash}
+          loading={trashLoading}
+          emptyLabel="Trash is empty"
+          renderLabel={(ev: any) => ev.title}
+          renderMeta={(ev: any) => `${TYPE_LABELS[ev.type] || ev.type} · ${ev.mode}`}
+          onRestore={restore}
+          onPermanentDelete={permaDel}
+        />
+      ) : (
+      <>
       {open && (
         <form className="adm-form" onSubmit={submit}>
           <div className="adm-form-title">{editId ? 'Edit Event' : 'New Event'}</div>
@@ -468,6 +507,8 @@ export default function EventsPanel() {
           </div>
           <AdminPager page={page} pageCount={pageCount} total={total} onChange={setPage} />
         </>
+      )}
+      </>
       )}
     </div>
   );

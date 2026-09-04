@@ -19,6 +19,12 @@ const teamMemberSchema = new mongoose.Schema(
     // Explicit display order (lower = earlier). Falls back to
     // createdAt when unset so newly migrated docs still sort sanely.
     order: { type: Number, default: 0 },
+
+    // Soft delete: set instead of removing the document, so a deletion
+    // can be undone from the admin Trash view. `null` (the default,
+    // and also what a pre-existing document with no field at all
+    // behaves as in queries) means "not deleted".
+    deletedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

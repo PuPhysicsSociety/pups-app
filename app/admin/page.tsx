@@ -4,12 +4,14 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import {
   getColloquium, createColloquium, updateColloquium, deleteColloquium,
+  restoreColloquium, permanentlyDeleteColloquium,
   getTeam, createTeamMember, updateTeamMember, deleteTeamMember, getImageUrl,
   uploadToCloudinary, migrateTeam, reorderTeam,
+  restoreTeamMember, permanentlyDeleteTeamMember,
 } from '../../lib/api';
 import EventsPanel from './EventsPanel';
 import PagesPanel from './PagesPanel';
-import { useSearchPage, AdminSearchBar, AdminPager } from './AdminListControls';
+import { useSearchPage, AdminSearchBar, AdminPager, TrashToggle, TrashList } from './AdminListControls';
 
 // ── tiny helpers ──────────────────────────────────────────────────────────────
 
@@ -196,8 +198,29 @@ function ColloquiaPanel() {
   };
 
   const del = async (id: string) => {
-    if (!confirm('Delete colloquium?')) return;
+    if (!confirm('Move this colloquium to trash? You can restore it later from the Trash view.')) return;
     try { await deleteColloquium(id); load(); } catch { setErr('Delete failed'); }
+  };
+
+  const [showTrash, setShowTrash] = useState(false);
+  const [trash, setTrash] = useState<any[]>([]);
+  const [trashLoading, setTrashLoading] = useState(false);
+
+  const loadTrash = () => {
+    setTrashLoading(true);
+    getColloquium('?trashed=true').then(d => setTrash(d.data || [])).catch(() => setErr('Failed to load trash')).finally(() => setTrashLoading(false));
+  };
+  const toggleTrash = () => {
+    const next = !showTrash;
+    setShowTrash(next);
+    if (next) loadTrash();
+  };
+  const restore = async (id: string) => {
+    try { await restoreColloquium(id); loadTrash(); load(); } catch { setErr('Restore failed'); }
+  };
+  const permaDel = async (id: string) => {
+    if (!confirm('Permanently delete this colloquium? This cannot be undone.')) return;
+    try { await permanentlyDeleteColloquium(id); loadTrash(); } catch { setErr('Delete failed'); }
   };
 
   const { query, setQuery, page, setPage, pageCount, paged, total } = useSearchPage(
@@ -210,12 +233,29 @@ function ColloquiaPanel() {
     <div>
       <div className="adm-sec-head">
         <div className="adm-h">Colloquia</div>
-        <button className={`adm-btn ${open && !editId ? 'ghost' : ''}`} onClick={() => { reset(); setOpen(o => !o); }}>
-          {open && !editId ? '✕ Cancel' : '+ New Colloquium'}
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <TrashToggle showing={showTrash} onToggle={toggleTrash} />
+          {!showTrash && (
+            <button className={`adm-btn ${open && !editId ? 'ghost' : ''}`} onClick={() => { reset(); setOpen(o => !o); }}>
+              {open && !editId ? '✕ Cancel' : '+ New Colloquium'}
+            </button>
+          )}
+        </div>
       </div>
       <Msg ok={ok} err={err} />
 
+      {showTrash ? (
+        <TrashList
+          items={trash}
+          loading={trashLoading}
+          emptyLabel="Trash is empty"
+          renderLabel={(c: any) => c.name}
+          renderMeta={(c: any) => `${c.date}${c.speaker ? ` · ${c.speaker}` : ''}`}
+          onRestore={restore}
+          onPermanentDelete={permaDel}
+        />
+      ) : (
+      <>
       {open && (
         <form className="adm-form" onSubmit={submit}>
           <div className="adm-form-title">{editId ? 'Edit Colloquium' : 'New Colloquium'}</div>
@@ -263,6 +303,8 @@ function ColloquiaPanel() {
           </div>
           <AdminPager page={page} pageCount={pageCount} total={total} onChange={setPage} />
         </>
+      )}
+      </>
       )}
     </div>
   );
@@ -374,8 +416,29 @@ function TeamPanel() {
   };
 
   const del = async (id: string) => {
-    if (!confirm('Remove member?')) return;
+    if (!confirm('Move this member to trash? You can restore them later from the Trash view.')) return;
     try { await deleteTeamMember(id); load(); } catch { setErr('Delete failed'); }
+  };
+
+  const [showTrash, setShowTrash] = useState(false);
+  const [trash, setTrash] = useState<any[]>([]);
+  const [trashLoading, setTrashLoading] = useState(false);
+
+  const loadTrash = () => {
+    setTrashLoading(true);
+    getTeam('?trashed=true').then(d => setTrash(d.data || [])).catch(() => setErr('Failed to load trash')).finally(() => setTrashLoading(false));
+  };
+  const toggleTrash = () => {
+    const next = !showTrash;
+    setShowTrash(next);
+    if (next) loadTrash();
+  };
+  const restore = async (id: string) => {
+    try { await restoreTeamMember(id); loadTrash(); load(); } catch { setErr('Restore failed'); }
+  };
+  const permaDel = async (id: string) => {
+    if (!confirm('Permanently delete this member? This cannot be undone.')) return;
+    try { await permanentlyDeleteTeamMember(id); loadTrash(); } catch { setErr('Delete failed'); }
   };
 
   // Reordering (drag or the up/down buttons) only makes sense against the
@@ -392,12 +455,29 @@ function TeamPanel() {
     <div>
       <div className="adm-sec-head">
         <div className="adm-h">Team</div>
-        <button className={`adm-btn ${open && !editId ? 'ghost' : ''}`} onClick={() => { reset(); setOpen(o => !o); }}>
-          {open && !editId ? '✕ Cancel' : '+ Add Member'}
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <TrashToggle showing={showTrash} onToggle={toggleTrash} />
+          {!showTrash && (
+            <button className={`adm-btn ${open && !editId ? 'ghost' : ''}`} onClick={() => { reset(); setOpen(o => !o); }}>
+              {open && !editId ? '✕ Cancel' : '+ Add Member'}
+            </button>
+          )}
+        </div>
       </div>
       <Msg ok={ok} err={err} />
 
+      {showTrash ? (
+        <TrashList
+          items={trash}
+          loading={trashLoading}
+          emptyLabel="Trash is empty"
+          renderLabel={(m: any) => m.name}
+          renderMeta={(m: any) => m.role}
+          onRestore={restore}
+          onPermanentDelete={permaDel}
+        />
+      ) : (
+      <>
       {open && (
         <form className="adm-form" onSubmit={submit}>
           <div className="adm-form-title">{editId ? 'Edit Member' : 'New Member'}</div>
@@ -501,6 +581,8 @@ function TeamPanel() {
             ))}
           </div>
         </>
+      )}
+      </>
       )}
     </div>
   );

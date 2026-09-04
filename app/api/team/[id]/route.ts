@@ -25,10 +25,12 @@ export async function GET(req: NextRequest, { params }: Context) {
   try {
     await dbReady;
     const item = await TeamMember.findById(id);
-    // Treat an inactive member as not-found for anonymous visitors, same
-    // as the collection endpoint — no distinguishing "exists but hidden"
-    // response that would confirm a guessed ID belongs to a real record.
-    if (!item || (!item.active && !isAuthenticated(req))) {
+    const admin = isAuthenticated(req);
+    // Treat an inactive or soft-deleted member as not-found for anonymous
+    // visitors, same as the collection endpoint — no distinguishing
+    // "exists but hidden" response that would confirm a guessed ID
+    // belongs to a real record.
+    if (!item || (!admin && (!item.active || item.deletedAt))) {
       return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
     }
     return NextResponse.json({ success: true, data: item });
@@ -80,12 +82,14 @@ export async function DELETE(req: NextRequest, { params }: Context) {
   const { id } = await params;
   try {
     await dbReady;
-    const item = await TeamMember.findByIdAndDelete(id);
+    // Soft delete — moves the record into the admin Trash view instead of
+    // removing it outright. The Cloudinary photo is left alone until a
+    // permanent delete, since the member might still be restored.
+    const item = await TeamMember.findByIdAndUpdate(id, { deletedAt: new Date() }, { new: true });
     if (!item) {
       return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
     }
-    if (item.photo) await deleteCloudinaryAsset(item.photo);
-    return NextResponse.json({ success: true, message: 'Deleted successfully' });
+    return NextResponse.json({ success: true, message: 'Moved to trash' });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json({ success: false, message }, { status: 500 });

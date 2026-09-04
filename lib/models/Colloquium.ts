@@ -13,6 +13,9 @@ const colloquiumSchema = new mongoose.Schema(
     ytLink: String,
     poster: String,
     reg_form_link: String,
+
+    // Soft delete — see TeamMember.ts for the same pattern/rationale.
+    deletedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

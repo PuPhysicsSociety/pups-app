@@ -1,15 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Event from '@/lib/models/Event';
-import { verifyAuth } from '@/lib/auth';
+import { verifyAuth, isAuthenticated } from '@/lib/auth';
 
 const dbReady = connectDB();
 
 export async function GET(req: NextRequest) {
   try {
     await dbReady;
+    const admin = isAuthenticated(req);
+
+    if (admin && req.nextUrl.searchParams.get('trashed') === 'true') {
+      const items = await Event.find({ deletedAt: { $ne: null } }).sort({ deletedAt: -1 });
+      return NextResponse.json({ success: true, data: items });
+    }
+
     const type = req.nextUrl.searchParams.get('type');
-    const filter = type ? { type } : {};
+    const filter: Record<string, unknown> = { deletedAt: null };
+    if (type) filter.type = type;
     const items = await Event.find(filter).sort({ 'date_time.start': -1 });
     return NextResponse.json({ success: true, data: items });
   } catch (err: unknown) {

@@ -20,13 +20,24 @@ interface TeamMemberBody {
 export async function GET(req: NextRequest) {
   try {
     await dbReady;
+    const admin = isAuthenticated(req);
+
+    // Trash view — only ever available to an authenticated admin, and
+    // deliberately ignores every other filter (active/etc. don't apply
+    // to deleted records).
+    if (admin && req.nextUrl.searchParams.get('trashed') === 'true') {
+      const items = await TeamMember.find({ deletedAt: { $ne: null } }).sort({ deletedAt: -1 });
+      return NextResponse.json({ success: true, data: items });
+    }
+
     // Anonymous visitors only ever get active members — inactive records
     // (and any contact info on them) stay admin-only regardless of query
     // params. A logged-in admin can still request active-only explicitly
-    // (e.g. to preview the public view).
-    const admin = isAuthenticated(req);
+    // (e.g. to preview the public view). Soft-deleted records never show
+    // up here for anyone — that's what the trash view above is for.
     const wantsActiveOnly = req.nextUrl.searchParams.get('active') === 'true';
-    const filter = admin && !wantsActiveOnly ? {} : { active: true };
+    const filter: Record<string, unknown> = { deletedAt: null };
+    if (!admin || wantsActiveOnly) filter.active = true;
     const items = await TeamMember.find(filter).sort({ order: 1, createdAt: 1 });
     return NextResponse.json({ success: true, data: items });
   } catch (err: unknown) {

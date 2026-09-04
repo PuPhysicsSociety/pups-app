@@ -54,3 +54,49 @@ export function AdminPager({
     </div>
   );
 }
+
+export function TrashToggle({
+  showing, onToggle,
+}: { showing: boolean; onToggle: () => void }) {
+  return (
+    <button type="button" className={`adm-btn ${showing ? '' : 'ghost'}`} onClick={onToggle}>
+      {showing ? '← Back to list' : '🗑 Trash'}
+    </button>
+  );
+}
+
+export function TrashList<T extends { id: string }>({
+  items, loading, emptyLabel, renderLabel, renderMeta, onRestore, onPermanentDelete,
+}: {
+  items: T[];
+  loading: boolean;
+  emptyLabel: string;
+  renderLabel: (item: T) => React.ReactNode;
+  renderMeta?: (item: T) => React.ReactNode;
+  onRestore: (id: string) => void;
+  onPermanentDelete: (id: string) => void;
+}) {
+  if (loading) return <div className="adm-empty">Loading…</div>;
+  if (items.length === 0) return <div className="adm-empty">{emptyLabel}</div>;
+  return (
+    <>
+      <div style={{ fontSize: 11, color: 'var(--tx4)', margin: '4px 0 14px' }}>
+        Deleted items stay here until permanently removed. Restoring puts them back exactly as they were.
+      </div>
+      <div className="adm-list">
+        {items.map(item => (
+          <div key={item.id} className="adm-row">
+            <div className="adm-row-info">
+              <div className="adm-row-title">{renderLabel(item)}</div>
+              {renderMeta && <div className="adm-row-meta">{renderMeta(item)}</div>}
+            </div>
+            <div className="adm-row-actions">
+              <button className="adm-action" onClick={() => onRestore(item.id)}>Restore</button>
+              <button className="adm-action del" onClick={() => onPermanentDelete(item.id)}>Delete forever</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}

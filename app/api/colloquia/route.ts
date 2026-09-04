@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Colloquium from '@/lib/models/Colloquium';
-import { verifyAuth } from '@/lib/auth';
+import { verifyAuth, isAuthenticated } from '@/lib/auth';
 
 const dbReady = connectDB();
 
@@ -16,10 +16,17 @@ interface ColloquiumBody {
   reg_form_link?: string;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     await dbReady;
-    const items = await Colloquium.find().sort({ createdAt: -1 });
+    const admin = isAuthenticated(req);
+
+    if (admin && req.nextUrl.searchParams.get('trashed') === 'true') {
+      const items = await Colloquium.find({ deletedAt: { $ne: null } }).sort({ deletedAt: -1 });
+      return NextResponse.json({ success: true, data: items });
+    }
+
+    const items = await Colloquium.find({ deletedAt: null }).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, data: items });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';

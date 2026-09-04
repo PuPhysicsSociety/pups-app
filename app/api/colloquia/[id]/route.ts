@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Colloquium from '@/lib/models/Colloquium';
-import { verifyAuth } from '@/lib/auth';
+import { verifyAuth, isAuthenticated } from '@/lib/auth';
 
 const dbReady = connectDB();
 
@@ -18,12 +18,12 @@ interface ColloquiumUpdateBody {
   reg_form_link?: string;
 }
 
-export async function GET(_req: NextRequest, { params }: Context) {
+export async function GET(req: NextRequest, { params }: Context) {
   const { id } = await params;
   try {
     await dbReady;
     const item = await Colloquium.findById(id);
-    if (!item) {
+    if (!item || (item.deletedAt && !isAuthenticated(req))) {
       return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
     }
     return NextResponse.json({ success: true, data: item });
@@ -62,11 +62,12 @@ export async function DELETE(req: NextRequest, { params }: Context) {
   const { id } = await params;
   try {
     await dbReady;
-    const item = await Colloquium.findByIdAndDelete(id);
+    // Soft delete — see TeamMember's DELETE handler for the same pattern.
+    const item = await Colloquium.findByIdAndUpdate(id, { deletedAt: new Date() }, { new: true });
     if (!item) {
       return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
     }
-    return NextResponse.json({ success: true, message: 'Deleted successfully' });
+    return NextResponse.json({ success: true, message: 'Moved to trash' });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json({ success: false, message }, { status: 500 });

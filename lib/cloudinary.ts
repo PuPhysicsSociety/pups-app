@@ -45,4 +45,13 @@ export async function deleteCloudinaryAsset(
   }
 }
 
+/** Same as `deleteCloudinaryAsset`, for an array of URLs (e.g. an event's photo gallery). */
+export async function deleteCloudinaryAssets(
+  urls?: (string | null | undefined)[],
+  resourceType: 'image' | 'video' | 'raw' = 'image'
+): Promise<void> {
+  if (!urls?.length) return;
+  await Promise.all(urls.map(u => deleteCloudinaryAsset(u, resourceType)));
+}
+
 export default cloudinary;

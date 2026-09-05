@@ -40,3 +40,24 @@ export function verifyAuth(
 export function isAuthenticated(req: NextRequest): boolean {
   return !(verifyAuth(req) instanceof NextResponse);
 }
+
+export interface PreviewPayload {
+  purpose: 'preview';
+  page: 'home' | 'about' | 'contact';
+}
+
+/**
+ * Verifies a short-lived preview token (see
+ * /api/site-content/[page]/preview-token). Distinct from the main admin
+ * JWT so a leaked preview link — which by design travels in a URL, e.g.
+ * pasted into a Slack message — can't be used for anything beyond
+ * viewing one page's draft for a few minutes.
+ */
+export function verifyPreviewToken(token: string, page: string): boolean {
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET!) as PreviewPayload;
+    return payload.purpose === 'preview' && payload.page === page;
+  } catch {
+    return false;
+  }
+}

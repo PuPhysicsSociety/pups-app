@@ -1,8 +1,10 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getEvents } from '@/lib/api';
+import { withMinDelay } from '@/lib/withMinDelay';
 import { UnifiedEvent } from '../../../types';
+import PendulumLoader from '@/components/ui/PendulumLoader';
 
 const T = {
   tx:    'var(--tx,   #1a1710)',
@@ -139,13 +141,45 @@ export default function EventsPage() {
   const [events,  setEvents]  = useState<UnifiedEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState('');
+  const [query, setQuery]     = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [yearFilter, setYearFilter] = useState('all');
 
   useEffect(() => {
-    getEvents()
+    withMinDelay(getEvents())
       .then(data => setEvents(data.data || []))
       .catch(() => setError('Could not load events.'))
       .finally(() => setLoading(false));
   }, []);
+
+  const years = useMemo(() => {
+    const set = new Set<string>();
+    events.forEach(ev => {
+      const y = ev.dateTime?.start ? new Date(ev.dateTime.start).getFullYear() : null;
+      if (y && !isNaN(y)) set.add(String(y));
+    });
+    return Array.from(set).sort((a, b) => Number(b) - Number(a));
+  }, [events]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return events.filter(ev => {
+      if (typeFilter !== 'all' && ev.type !== typeFilter) return false;
+      if (yearFilter !== 'all') {
+        const y = ev.dateTime?.start ? new Date(ev.dateTime.start).getFullYear() : null;
+        if (String(y) !== yearFilter) return false;
+      }
+      if (!q) return true;
+      const speakerMatch = ev.lecturerDetails?.some(l => l.name?.toLowerCase().includes(q));
+      return (
+        ev.title?.toLowerCase().includes(q) ||
+        ev.description?.toLowerCase().includes(q) ||
+        !!speakerMatch
+      );
+    });
+  }, [events, query, typeFilter, yearFilter]);
+
+  const hasFilters = query.trim() !== '' || typeFilter !== 'all' || yearFilter !== 'all';
 
   return (
     <section className="section">
@@ -155,14 +189,56 @@ export default function EventsPage() {
           <h2 className="sec-title">Conferences, workshops &amp; <em>gatherings</em>.</h2>
         </div>
 
-        {loading && (
+        {!loading && !error && events.length > 0 && (
           <div style={{
-            padding: '40px 0', color: 'var(--tx4)',
-            fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase',
+            display: 'flex', flexWrap: 'wrap' as const, gap: 12,
+            marginBottom: 32, alignItems: 'center',
           }}>
-            Loading…
+            <input
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Search by title, speaker…"
+              style={{
+                flex: '1 1 220px', minWidth: 180, padding: '10px 14px',
+                fontFamily: T.mono, fontSize: 12.5, color: T.tx,
+                background: 'transparent', border: `1px solid ${T.rule}`,
+                outline: 'none',
+              }}
+            />
+            <select
+              value={typeFilter}
+              onChange={e => setTypeFilter(e.target.value)}
+              style={{
+                padding: '10px 12px', fontFamily: T.mono, fontSize: 11.5,
+                color: T.tx2, background: 'transparent', border: `1px solid ${T.rule}`,
+                outline: 'none', cursor: 'pointer',
+              }}
+            >
+              <option value="all">All types</option>
+              {Object.entries(TYPE_LABELS).map(([val, label]) => (
+                <option key={val} value={val}>{label}</option>
+              ))}
+            </select>
+            {years.length > 0 && (
+              <select
+                value={yearFilter}
+                onChange={e => setYearFilter(e.target.value)}
+                style={{
+                  padding: '10px 12px', fontFamily: T.mono, fontSize: 11.5,
+                  color: T.tx2, background: 'transparent', border: `1px solid ${T.rule}`,
+                  outline: 'none', cursor: 'pointer',
+                }}
+              >
+                <option value="all">All years</option>
+                {years.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+            )}
           </div>
         )}
+
+        {loading && <PendulumLoader label="Loading events" />}
+
         {error && (
           <div style={{ padding: '40px 0', color: '#8c1c1c', fontSize: 12 }}>
             {error}
@@ -173,10 +249,15 @@ export default function EventsPage() {
             No events available yet.
           </div>
         )}
+        {!loading && !error && events.length > 0 && filtered.length === 0 && (
+          <div style={{ padding: '40px 0', color: 'var(--tx4)', fontSize: 12 }}>
+            No events match{hasFilters ? ' your search' : ''}.
+          </div>
+        )}
 
-        {!loading && !error && events.length > 0 && (
+        {!loading && !error && filtered.length > 0 && (
           <div>
-            {events.map(ev => (
+            {filtered.map(ev => (
               <EventRow
                 key={ev.id}
                 event={ev}

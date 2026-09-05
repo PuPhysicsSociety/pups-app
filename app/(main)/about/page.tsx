@@ -1,16 +1,24 @@
 import React from 'react';
 import { getSiteContentServer } from '@/lib/server/siteContent';
 import { renderRichText, splitParagraphs } from '@/components/ui/emphasis';
+import PreviewBanner from '@/components/ui/PreviewBanner';
 
 // See app/(main)/page.tsx for why this is needed on fixed-path pages that
 // read admin-editable content server-side.
 export const dynamic = 'force-dynamic';
 
-export default async function AboutPage() {
-  const content = await getSiteContentServer('about');
+export default async function AboutPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ preview?: string }>;
+}) {
+  const { preview } = await searchParams;
+  const content = await getSiteContentServer('about', preview);
 
   return (
-    <section className="section">
+    <>
+      {preview && <PreviewBanner />}
+      <section className="section">
       <div className="wrap">
         <div className="sec-head">
           <div className="sec-label"><b>{content.sectionLabel}</b>About</div>
@@ -40,5 +48,6 @@ export default async function AboutPage() {
         </div>
       </div>
     </section>
+    </>
   );
 }

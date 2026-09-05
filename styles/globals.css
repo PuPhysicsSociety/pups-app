@@ -662,3 +662,19 @@ site-footer { background: var(--s2); padding: 48px 0 32px; border-top: 1px solid
   }
   .ev-row > :first-child { display: none; }
 }
+/* ── Skeleton loading placeholders ─────────────────────────────────────── */
+@keyframes skeleton-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--s2) 25%,
+    var(--s1) 37%,
+    var(--s2) 63%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  border-radius: 3px;
+}

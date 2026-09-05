@@ -2,6 +2,7 @@ import React from 'react';
 import { Instagram, Linkedin, Youtube, Link2 } from 'lucide-react';
 import { getSiteContentServer } from '@/lib/server/siteContent';
 import { renderRichText, splitParagraphs } from '@/components/ui/emphasis';
+import PreviewBanner from '@/components/ui/PreviewBanner';
 
 function FacebookIcon({ size = 18 }: { size?: number }) {
   return (
@@ -37,11 +38,18 @@ function socialIcon(label: string) {
 // read admin-editable content server-side.
 export const dynamic = 'force-dynamic';
 
-export default async function ContactPage() {
-  const content = await getSiteContentServer('contact');
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ preview?: string }>;
+}) {
+  const { preview } = await searchParams;
+  const content = await getSiteContentServer('contact', preview);
 
   return (
-    <section className="section">
+    <>
+      {preview && <PreviewBanner />}
+      <section className="section">
       <div className="wrap">
         <div className="sec-head">
           <div className="sec-label"><b>{content.sectionLabel}</b>Contact</div>
@@ -111,5 +119,6 @@ export default async function ContactPage() {
         </div>
       </div>
     </section>
+    </>
   );
 }

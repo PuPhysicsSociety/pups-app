@@ -110,21 +110,42 @@ export function normColloquium(raw: any) {
 
 // ── Site Content (Home / About / Contact) ──────────────────────────────────────
 
-export async function getSiteContent(page: 'home' | 'about' | 'contact') {
+type SiteContentPage = 'home' | 'about' | 'contact';
+
+export async function getSiteContent(page: SiteContentPage) {
   const res = await fetch(`${API}/site-content/${page}`);
   return handleRes(res);
 }
 
-export async function updateSiteContent(page: 'home' | 'about' | 'contact', data: object) {
-  const res = await fetch(`${API}/site-content/${page}`, {
+/** Admin-only variant: also returns `draft` (merged over published) if one exists. */
+export async function getSiteContentForAdmin(page: SiteContentPage) {
+  const res = await fetch(`${API}/site-content/${page}?admin=true`, { headers: authHeaders() });
+  return handleRes(res);
+}
+
+/**
+ * `mode: 'draft'` saves without touching the live site. `mode: 'publish'`
+ * (the default) makes the content live immediately and clears any pending
+ * draft, since it's now superseded.
+ */
+export async function updateSiteContent(page: SiteContentPage, data: object, mode: 'draft' | 'publish' = 'publish') {
+  const res = await fetch(`${API}/site-content/${page}?mode=${mode}`, {
     method: 'PUT', headers: jsonHeaders(), body: JSON.stringify(data),
   });
   return handleRes(res);
 }
 
-export async function resetSiteContent(page: 'home' | 'about' | 'contact') {
+export async function resetSiteContent(page: SiteContentPage) {
   const res = await fetch(`${API}/site-content/${page}`, {
     method: 'DELETE', headers: authHeaders(),
+  });
+  return handleRes(res);
+}
+
+/** Short-lived token for previewing a page's unpublished draft. */
+export async function getSiteContentPreviewToken(page: SiteContentPage) {
+  const res = await fetch(`${API}/site-content/${page}/preview-token`, {
+    method: 'POST', headers: authHeaders(),
   });
   return handleRes(res);
 }

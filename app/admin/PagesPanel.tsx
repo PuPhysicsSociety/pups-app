@@ -1,7 +1,85 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { getSiteContent, updateSiteContent, resetSiteContent } from '../../lib/api';
+import {
+  getSiteContentForAdmin, updateSiteContent, resetSiteContent, getSiteContentPreviewToken,
+} from '../../lib/api';
 import { DEFAULT_HOME, DEFAULT_ABOUT, DEFAULT_CONTACT, HomeContent, AboutContent, ContactContent } from '../../lib/defaultSiteContent';
+
+type SiteContentPage = 'home' | 'about' | 'contact';
+
+const PAGE_PATH: Record<SiteContentPage, string> = { home: '/', about: '/about', contact: '/contact' };
+
+/**
+ * Shared load/save/publish/preview logic for all three page editors below.
+ * Loading pulls the draft (if any) over published — an admin coming back
+ * to a half-finished edit should see the draft, not lose it. "Preview"
+ * saves the current form as a draft first so the preview link reflects
+ * exactly what's on screen, then opens it in a new tab.
+ */
+function usePageEditor<T>(page: SiteContentPage, fallback: T) {
+  const [form, setForm] = useState<T>(fallback);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [ok, setOk] = useState('');
+  const [err, setErr] = useState('');
+  const [hasDraft, setHasDraft] = useState(false);
+
+  const load = () => {
+    setLoading(true);
+    getSiteContentForAdmin(page)
+      .then(d => {
+        if (d.draft) { setForm(d.draft); setHasDraft(true); }
+        else { setForm(d.data || fallback); setHasDraft(false); }
+      })
+      .catch(() => setErr('Failed to load'))
+      .finally(() => setLoading(false));
+  };
+  useEffect(load, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const flash = (msg: string) => { setOk(msg); setTimeout(() => setOk(''), 3000); };
+
+  const saveDraft = async (silent = false) => {
+    setBusy(true); setErr('');
+    try {
+      await updateSiteContent(page, form as object, 'draft');
+      setHasDraft(true);
+      if (!silent) flash('Draft saved');
+    } catch (e: any) { setErr(e.message || 'Save failed'); throw e; }
+    finally { setBusy(false); }
+  };
+
+  const publish = async () => {
+    setBusy(true); setErr('');
+    try {
+      await updateSiteContent(page, form as object, 'publish');
+      setHasDraft(false);
+      flash('Published — live on the site now');
+    } catch (e: any) { setErr(e.message || 'Publish failed'); }
+    finally { setBusy(false); }
+  };
+
+  const preview = async () => {
+    setErr('');
+    try {
+      await saveDraft(true);
+      const { token } = await getSiteContentPreviewToken(page);
+      window.open(`${PAGE_PATH[page]}?preview=${token}`, '_blank', 'noopener');
+    } catch (e: any) { setErr(e.message || 'Preview failed'); }
+  };
+
+  const reset = async () => {
+    if (!confirm(`Reset the ${page} page to its default content? This discards your customisations, including any unpublished draft.`)) return;
+    setBusy(true); setErr('');
+    try {
+      const d = await resetSiteContent(page);
+      setForm(d.data); setHasDraft(false);
+      flash('Reset to default');
+    } catch (e: any) { setErr(e.message || 'Reset failed'); }
+    finally { setBusy(false); }
+  };
+
+  return { form, setForm, loading, busy, ok, err, hasDraft, saveDraft, publish, preview, reset };
+}
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -56,30 +134,50 @@ export default function PagesPanel() {
   );
 }
 
-// ── shared save/reset bar ───────────────────────────────────────────────────
+// ── shared draft / publish / preview bar ────────────────────────────────────
 
-function SaveBar({ busy, onSave, onReset }: { busy: boolean; onSave: () => void; onReset: () => void }) {
+function EditorBar({ busy, hasDraft, onSaveDraft, onPublish, onPreview, onReset }: {
+  busy: boolean;
+  hasDraft: boolean;
+  onSaveDraft: () => void;
+  onPublish: () => void;
+  onPreview: () => void;
+  onReset: () => void;
+}) {
   return (
-    <div className="adm-form-btns">
-      <button type="button" disabled={busy} className="adm-btn" onClick={onSave}>{busy ? 'Saving…' : 'Save changes'}</button>
-      <button type="button" className="adm-btn ghost" onClick={onReset}>Reset to default</button>
-    </div>
+    <>
+      {hasDraft && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          fontSize: 11.5, color: 'var(--cr)', margin: '4px 0 16px',
+        }}>
+          <span style={{ fontSize: 16, lineHeight: 1 }}>●</span>
+          You have an unpublished draft. Publish to make it live, or Preview to see it first.
+        </div>
+      )}
+      <div className="adm-form-btns">
+        <button type="button" disabled={busy} className="adm-btn ghost" onClick={onSaveDraft}>
+          {busy ? '…' : 'Save draft'}
+        </button>
+        <button type="button" disabled={busy} className="adm-btn" onClick={onPublish}>
+          {busy ? 'Publishing…' : 'Publish'}
+        </button>
+        <button type="button" disabled={busy} className="adm-btn ghost" onClick={onPreview}>
+          Preview
+        </button>
+        <button type="button" className="adm-btn ghost" onClick={onReset}>
+          Reset to default
+        </button>
+      </div>
+    </>
   );
 }
 
 // ── Home ──────────────────────────────────────────────────────────────────────
 
 function HomeEditor() {
-  const [form, setForm] = useState<HomeContent>(DEFAULT_HOME);
-  const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(false);
-  const [ok, setOk] = useState(''); const [err, setErr] = useState('');
-
-  const load = () => {
-    setLoading(true);
-    getSiteContent('home').then(d => setForm(d.data || DEFAULT_HOME)).catch(() => setErr('Failed to load')).finally(() => setLoading(false));
-  };
-  useEffect(load, []);
+  const { form, setForm, loading, busy, ok, err, hasDraft, saveDraft, publish, preview, reset } =
+    usePageEditor<HomeContent>('home', DEFAULT_HOME);
 
   const s = (k: keyof HomeContent, v: any) => setForm(f => ({ ...f, [k]: v }));
 
@@ -90,20 +188,6 @@ function HomeEditor() {
   };
   const addPillar = () => s('pillars', [...form.pillars, { title: '', description: '' }]);
   const removePillar = (i: number) => s('pillars', form.pillars.filter((_, idx) => idx !== i));
-
-  const save = async () => {
-    setBusy(true); setErr('');
-    try { await updateSiteContent('home', form); setOk('Saved'); setTimeout(() => setOk(''), 3000); }
-    catch (e: any) { setErr(e.message || 'Save failed'); }
-    finally { setBusy(false); }
-  };
-  const reset = async () => {
-    if (!confirm('Reset the Home page to its default content? This discards your customisations.')) return;
-    setBusy(true); setErr('');
-    try { const d = await resetSiteContent('home'); setForm(d.data); setOk('Reset to default'); setTimeout(() => setOk(''), 3000); }
-    catch (e: any) { setErr(e.message || 'Reset failed'); }
-    finally { setBusy(false); }
-  };
 
   if (loading) return <div className="adm-empty">Loading…</div>;
 
@@ -142,7 +226,7 @@ function HomeEditor() {
         <button type="button" className="adm-btn ghost" onClick={addPillar}>+ Add pillar</button>
       </div>
 
-      <SaveBar busy={busy} onSave={save} onReset={reset} />
+      <EditorBar busy={busy} hasDraft={hasDraft} onSaveDraft={() => saveDraft()} onPublish={publish} onPreview={preview} onReset={reset} />
     </div>
   );
 }
@@ -150,16 +234,8 @@ function HomeEditor() {
 // ── About ─────────────────────────────────────────────────────────────────────
 
 function AboutEditor() {
-  const [form, setForm] = useState<AboutContent>(DEFAULT_ABOUT);
-  const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(false);
-  const [ok, setOk] = useState(''); const [err, setErr] = useState('');
-
-  const load = () => {
-    setLoading(true);
-    getSiteContent('about').then(d => setForm(d.data || DEFAULT_ABOUT)).catch(() => setErr('Failed to load')).finally(() => setLoading(false));
-  };
-  useEffect(load, []);
+  const { form, setForm, loading, busy, ok, err, hasDraft, saveDraft, publish, preview, reset } =
+    usePageEditor<AboutContent>('about', DEFAULT_ABOUT);
 
   const s = (k: keyof AboutContent, v: any) => setForm(f => ({ ...f, [k]: v }));
 
@@ -170,20 +246,6 @@ function AboutEditor() {
   };
   const addFact = () => s('facts', [...form.facts, { label: '', value: '' }]);
   const removeFact = (i: number) => s('facts', form.facts.filter((_, idx) => idx !== i));
-
-  const save = async () => {
-    setBusy(true); setErr('');
-    try { await updateSiteContent('about', form); setOk('Saved'); setTimeout(() => setOk(''), 3000); }
-    catch (e: any) { setErr(e.message || 'Save failed'); }
-    finally { setBusy(false); }
-  };
-  const reset = async () => {
-    if (!confirm('Reset the About page to its default content? This discards your customisations.')) return;
-    setBusy(true); setErr('');
-    try { const d = await resetSiteContent('about'); setForm(d.data); setOk('Reset to default'); setTimeout(() => setOk(''), 3000); }
-    catch (e: any) { setErr(e.message || 'Reset failed'); }
-    finally { setBusy(false); }
-  };
 
   if (loading) return <div className="adm-empty">Loading…</div>;
 
@@ -214,7 +276,7 @@ function AboutEditor() {
         <AField label="Column 2" col2 hint="Separate paragraphs with a blank line."><textarea rows={6} className="adm-textarea" value={form.column2} onChange={e => s('column2', e.target.value)} /></AField>
       </div>
 
-      <SaveBar busy={busy} onSave={save} onReset={reset} />
+      <EditorBar busy={busy} hasDraft={hasDraft} onSaveDraft={() => saveDraft()} onPublish={publish} onPreview={preview} onReset={reset} />
     </div>
   );
 }
@@ -222,16 +284,8 @@ function AboutEditor() {
 // ── Contact ───────────────────────────────────────────────────────────────────
 
 function ContactEditor() {
-  const [form, setForm] = useState<ContactContent>(DEFAULT_CONTACT);
-  const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(false);
-  const [ok, setOk] = useState(''); const [err, setErr] = useState('');
-
-  const load = () => {
-    setLoading(true);
-    getSiteContent('contact').then(d => setForm(d.data || DEFAULT_CONTACT)).catch(() => setErr('Failed to load')).finally(() => setLoading(false));
-  };
-  useEffect(load, []);
+  const { form, setForm, loading, busy, ok, err, hasDraft, saveDraft, publish, preview, reset } =
+    usePageEditor<ContactContent>('contact', DEFAULT_CONTACT);
 
   const s = (k: keyof ContactContent, v: any) => setForm(f => ({ ...f, [k]: v }));
 
@@ -242,20 +296,6 @@ function ContactEditor() {
   };
   const addSocial = () => s('socials', [...form.socials, { label: '', href: '' }]);
   const removeSocial = (i: number) => s('socials', form.socials.filter((_, idx) => idx !== i));
-
-  const save = async () => {
-    setBusy(true); setErr('');
-    try { await updateSiteContent('contact', form); setOk('Saved'); setTimeout(() => setOk(''), 3000); }
-    catch (e: any) { setErr(e.message || 'Save failed'); }
-    finally { setBusy(false); }
-  };
-  const reset = async () => {
-    if (!confirm('Reset the Contact page to its default content? This discards your customisations.')) return;
-    setBusy(true); setErr('');
-    try { const d = await resetSiteContent('contact'); setForm(d.data); setOk('Reset to default'); setTimeout(() => setOk(''), 3000); }
-    catch (e: any) { setErr(e.message || 'Reset failed'); }
-    finally { setBusy(false); }
-  };
 
   if (loading) return <div className="adm-empty">Loading…</div>;
 
@@ -291,7 +331,7 @@ function ContactEditor() {
       ))}
       <button type="button" className="adm-btn ghost" onClick={addSocial}>+ Add social link</button>
 
-      <SaveBar busy={busy} onSave={save} onReset={reset} />
+      <EditorBar busy={busy} hasDraft={hasDraft} onSaveDraft={() => saveDraft()} onPublish={publish} onPreview={preview} onReset={reset} />
     </div>
   );
 }

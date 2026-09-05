@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { Linkedin, Mail, User, ChevronDown, ChevronUp } from 'lucide-react';
 import { getTeam, getImageUrl } from '../../../lib/api';
+import { withMinDelay } from '@/lib/withMinDelay';
+import PendulumLoader from '@/components/ui/PendulumLoader';
 
 /* ── Types ── */
 interface TeamMember {
@@ -234,7 +236,7 @@ export default function TeamPage() {
   const [err, setErr] = useState(false);
 
   useEffect(() => {
-    getTeam('?active=true')
+    withMinDelay(getTeam('?active=true'))
       .then(d => setMembers((d.data || []).map(normalize)))
       .catch(() => setErr(true))
       .finally(() => setLoading(false));
@@ -245,7 +247,8 @@ export default function TeamPage() {
       <section className="team-hero">
         <div className="wrap">
           <div className="team-hero-kicker">Society · Est. 2025</div>
-          <h1 className="team-hero-h1">Loading team&hellip;</h1>
+          <h1 className="team-hero-h1">The people <em>behind</em><br />the society.</h1>
+          <PendulumLoader label="Gathering the committee" />
         </div>
       </section>
     );

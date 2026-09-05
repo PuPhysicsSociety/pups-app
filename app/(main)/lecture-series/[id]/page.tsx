@@ -1,8 +1,10 @@
 'use client';
+import PendulumLoader from '@/components/ui/PendulumLoader';
 import React, { useEffect, useState } from 'react';
 import { useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getEventById, getImageUrl } from '@/lib/api';
+import { withMinDelay } from '@/lib/withMinDelay';
 import { UnifiedEvent } from '../../../../types';
 
 const T = {
@@ -60,7 +62,7 @@ export default function LectureSeriesDetail() {
 
   useEffect(() => {
     if (!id) return;
-    getEventById(id)
+    withMinDelay(getEventById(id))
       .then(d => setEntry(d.data))
       .catch(() => setNotFoundFlag(true))
       .finally(() => setLoading(false));
@@ -69,9 +71,7 @@ export default function LectureSeriesDetail() {
   if (loading) return (
     <section className="section">
       <div className="wrap">
-        <div style={{ color: T.tx4, fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase', padding: '60px 0' }}>
-          Loading…
-        </div>
+        <PendulumLoader />
       </div>
     </section>
   );

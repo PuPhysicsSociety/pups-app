@@ -1,8 +1,10 @@
 'use client';
+import PendulumLoader from '@/components/ui/PendulumLoader';
 import React, { useEffect, useState } from 'react';
 import { useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getColloquiumById } from '@/lib/api';
+import { withMinDelay } from '@/lib/withMinDelay';
 import { Colloquium } from '../../../../types';
 
 export default function ColloquiumDetail() {
@@ -14,7 +16,7 @@ export default function ColloquiumDetail() {
 
   useEffect(() => {
     if (!id) return;
-    getColloquiumById(id)
+    withMinDelay(getColloquiumById(id))
       .then(data => setEntry(data.data))
       .catch(() => setNotFoundFlag(true))
       .finally(() => setLoading(false));
@@ -23,9 +25,7 @@ export default function ColloquiumDetail() {
   if (loading) return (
     <section className="section">
       <div className="wrap">
-        <div style={{ color: 'var(--tx4)', fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase', padding: '40px 0' }}>
-          Loading…
-        </div>
+        <PendulumLoader />
       </div>
     </section>
   );

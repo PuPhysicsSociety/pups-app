@@ -1,7 +1,9 @@
 'use client';
+import PendulumLoader from '@/components/ui/PendulumLoader';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getEvents } from '@/lib/api';
+import { withMinDelay } from '@/lib/withMinDelay';
 import { UnifiedEvent } from '../../../types';
 
 export default function LectureSeriesPage() {
@@ -9,7 +11,7 @@ export default function LectureSeriesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getEvents('?type=lecture_series')
+    withMinDelay(getEvents('?type=lecture_series'))
       .then(d => setList(d.data || []))
       .finally(() => setLoading(false));
   }, []);
@@ -23,9 +25,7 @@ export default function LectureSeriesPage() {
         </div>
 
         {loading && (
-          <div style={{ color: 'var(--tx4)', fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase', padding: '40px 0' }}>
-            Loading…
-          </div>
+          <PendulumLoader />
         )}
 
         {!loading && list.length === 0 && (

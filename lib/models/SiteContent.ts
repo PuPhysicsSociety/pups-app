@@ -11,6 +11,9 @@ const siteContentSchema = new mongoose.Schema(
   {
     page: { type: String, required: true, unique: true, enum: ['home', 'about', 'contact'] },
     data: { type: mongoose.Schema.Types.Mixed, required: true },
+    // Unpublished changes, saved separately so half-finished edits never
+    // show up on the live site until explicitly published.
+    draft: { type: mongoose.Schema.Types.Mixed, default: null },
   },
   { timestamps: true }
 );

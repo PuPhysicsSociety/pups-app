@@ -25,7 +25,7 @@ export default function LectureSeriesPage() {
         </div>
 
         {loading && (
-          <PendulumLoader />
+          <PendulumLoader label="Loading lecture series" />
         )}
 
         {!loading && list.length === 0 && (

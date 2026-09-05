@@ -71,7 +71,7 @@ export default function LectureSeriesDetail() {
   if (loading) return (
     <section className="section">
       <div className="wrap">
-        <PendulumLoader />
+        <PendulumLoader label="Loading lecture series" />
       </div>
     </section>
   );

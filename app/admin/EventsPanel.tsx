@@ -9,6 +9,37 @@ import { useSearchPage, AdminSearchBar, AdminPager, TrashToggle, TrashList } fro
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
+/**
+ * `<input type="date">` / `<input type="time">` give plain local wall-clock
+ * strings with no timezone info. Building the ISO string by hand (e.g.
+ * `${date}T${time}:00.000Z`) silently mislabels that local time as UTC —
+ * correct only for a visitor in UTC+0, wrong (and for evening times,
+ * off by a calendar day once converted back) for everyone else. These two
+ * helpers round-trip properly: `Date(y, m, d, h, min)` interprets the
+ * numbers as being in the *browser's* local timezone and converts them to
+ * true UTC, and the reverse extracts local components (not `.toISOString()`
+ * slicing, which would give UTC components) so editing an event shows back
+ * exactly the date/time that was typed in.
+ */
+function localDateTimeToISO(dateStr?: string, timeStr?: string): string | undefined {
+  if (!dateStr) return undefined;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const [hh, mm] = (timeStr || '00:00').split(':').map(Number);
+  const dt = new Date(y, (m || 1) - 1, d || 1, hh || 0, mm || 0, 0, 0);
+  return isNaN(dt.getTime()) ? undefined : dt.toISOString();
+}
+
+function isoToLocalDateTimeParts(iso?: string): { date: string; time: string } {
+  if (!iso) return { date: '', time: '' };
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return { date: '', time: '' };
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return {
+    date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+    time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+  };
+}
+
 function Msg({ ok, err }: { ok?: string; err?: string }) {
   if (ok)  return <div className="adm-msg-ok">✓ {ok}</div>;
   if (err) return <div className="adm-msg-err">{err}</div>;
@@ -103,15 +134,17 @@ export default function EventsPanel() {
   };
 
   const startEdit = (ev: any) => {
+    const start = isoToLocalDateTimeParts(ev.dateTime?.start);
+    const end   = isoToLocalDateTimeParts(ev.dateTime?.end);
     setForm({
       type:          ev.type || 'lecture_series',
       title:         ev.title,
       mode:          ev.mode || 'offline',
       description:   ev.description || '',
-      dateStartDate: ev.dateTime?.start ? new Date(ev.dateTime.start).toISOString().slice(0, 10) : '',
-      dateStartTime: ev.dateTime?.start ? new Date(ev.dateTime.start).toISOString().slice(11, 16) : '',
-      dateEndDate:   ev.dateTime?.end   ? new Date(ev.dateTime.end).toISOString().slice(0, 10)   : '',
-      dateEndTime:   ev.dateTime?.end   ? new Date(ev.dateTime.end).toISOString().slice(11, 16)  : '',
+      dateStartDate: start.date,
+      dateStartTime: start.time,
+      dateEndDate:   end.date,
+      dateEndTime:   end.time,
       schedule:      ev.dateTime?.schedule || '',
       noOfClasses:   ev.noOfClasses || '',
       reg_form_link: ev.regFormLink || '',
@@ -171,8 +204,8 @@ export default function EventsPanel() {
         mode:         form.mode,
         description:  form.description || undefined,
         date_time: {
-          start:    form.dateStartDate ? `${form.dateStartDate}T${form.dateStartTime || '00:00'}:00.000Z` : undefined,
-          end:      form.dateEndDate   ? `${form.dateEndDate}T${form.dateEndTime || '00:00'}:00.000Z`     : undefined,
+          start:    localDateTimeToISO(form.dateStartDate, form.dateStartTime),
+          end:      localDateTimeToISO(form.dateEndDate, form.dateEndTime),
           schedule: form.schedule || undefined,
         },
         reg_form_link:       form.reg_form_link || undefined,

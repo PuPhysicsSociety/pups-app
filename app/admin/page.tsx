@@ -20,8 +20,24 @@ const toDateTimeLocal = (iso?: string): string => {
   try {
     const d = new Date(iso);
     if (isNaN(d.getTime())) return '';
-    return d.toISOString().slice(0, 16);
+    // Extract LOCAL components (not .toISOString(), which gives UTC ones) so
+    // the datetime-local input shows back exactly what was originally typed.
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   } catch { return ''; }
+};
+
+// A native <input type="datetime-local"> value (e.g. "2026-09-09T19:00") has
+// no timezone marker. Sending that raw string to the server is risky —
+// whatever casts it into a Date (Mongoose, Node) does so in *its own*
+// timezone context, which on most hosts is UTC, not the admin's local one.
+// Building the Date here, client-side, correctly interprets the string as
+// the browser's local time and converts it to true UTC before it ever
+// leaves the browser.
+const localDateTimeToISOString = (value?: string): string | undefined => {
+  if (!value) return undefined;
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? undefined : d.toISOString();
 };
 
 function Msg({ ok, err }: { ok?: string; err?: string }) {
@@ -185,7 +201,7 @@ function ColloquiaPanel() {
       const body: any = {
         title: form.title,
         speaker: { name: form.speakerName, affiliation: form.speakerAff },
-        abstract: form.abstract, time: form.time || undefined,
+        abstract: form.abstract, time: localDateTimeToISOString(form.time),
         venue: form.venue || undefined, ytLink: form.ytLink || undefined,
         reg_form_link: form.reg_form_link || undefined, published: form.published,
       };

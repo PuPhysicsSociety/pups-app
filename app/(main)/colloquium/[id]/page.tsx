@@ -25,7 +25,7 @@ export default function ColloquiumDetail() {
   if (loading) return (
     <section className="section">
       <div className="wrap">
-        <PendulumLoader />
+        <PendulumLoader label="Loading colloquium" />
       </div>
     </section>
   );

@@ -172,7 +172,7 @@ export default function EventDetailPage() {
   if (loading) return (
     <section className="section">
       <div className="wrap">
-        <PendulumLoader />
+        <PendulumLoader label="Loading event" />
       </div>
     </section>
   );

@@ -230,58 +230,9 @@ function groupByCommittee(members: TeamMember[]) {
 }
 
 /* ── Page ── */
-export default function TeamPage() {
-  const [members, setMembers] = useState<TeamMember[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState(false);
-
-  useEffect(() => {
-    withMinDelay(getTeam('?active=true'))
-      .then(d => setMembers((d.data || []).map(normalize)))
-      .catch(() => setErr(true))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
-    return (
-      <section className="team-hero">
-        <div className="wrap">
-          <div className="team-hero-kicker">Society · Est. 2025</div>
-          <h1 className="team-hero-h1">The people <em>behind</em><br />the society.</h1>
-          <PendulumLoader label="Gathering the committee" />
-        </div>
-      </section>
-    );
-  }
-
-  if (err || members.length === 0) {
-    return (
-      <section className="team-hero">
-        <div className="wrap">
-          <div className="team-hero-kicker">Society · Est. 2025</div>
-          <h1 className="team-hero-h1">The people <em>behind</em><br />the society.</h1>
-          <p className="team-hero-lede">
-            {err ? 'Team data is temporarily unavailable — please check back shortly.' : 'No team members published yet.'}
-          </p>
-        </div>
-      </section>
-    );
-  }
-
-  const exec    = members.filter(m => classify(m) === 'exec');
-  const heads   = members.filter(m => classify(m) === 'head');
-  const phd     = members.filter(m => classify(m) === 'phd');
-  // "committee members" = heads + their members, grouped
-  const committeeMembers = members.filter(m => classify(m) === 'head' || (classify(m) === 'member' && !classify(m).includes('phd')));
-  // For grouping, include heads too so each committee has its head
-  const nonExecNonPhd = members.filter(m => classify(m) === 'head' || classify(m) === 'member');
-  const committeeGroups = groupByCommittee(nonExecNonPhd);
-
-  const totalCount = members.length;
-
+function TeamStyles() {
   return (
-    <>
-      <style>{`
+    <style>{`
         /* ── Team page styles ── */
         .team-hero {
           padding: 72px 0 56px;
@@ -649,7 +600,68 @@ export default function TeamPage() {
         @media (max-width: 480px) {
           .team-card { flex: 0 0 100%; max-width: 260px; }
         }
-      `}</style>
+    `}</style>
+  );
+}
+
+export default function TeamPage() {
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState(false);
+
+  useEffect(() => {
+    withMinDelay(getTeam('?active=true'))
+      .then(d => setMembers((d.data || []).map(normalize)))
+      .catch(() => setErr(true))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <TeamStyles />
+        <section className="team-hero">
+          <div className="wrap">
+            <div className="team-hero-kicker">Society · Est. 2025</div>
+            <h1 className="team-hero-h1">The people <em>behind</em><br />the society.</h1>
+            <PendulumLoader label="Gathering the committee" />
+          </div>
+        </section>
+      </>
+    );
+  }
+
+  if (err || members.length === 0) {
+    return (
+      <>
+        <TeamStyles />
+        <section className="team-hero">
+          <div className="wrap">
+            <div className="team-hero-kicker">Society · Est. 2025</div>
+            <h1 className="team-hero-h1">The people <em>behind</em><br />the society.</h1>
+            <p className="team-hero-lede">
+              {err ? 'Team data is temporarily unavailable — please check back shortly.' : 'No team members published yet.'}
+            </p>
+          </div>
+        </section>
+      </>
+    );
+  }
+
+  const exec    = members.filter(m => classify(m) === 'exec');
+  const heads   = members.filter(m => classify(m) === 'head');
+  const phd     = members.filter(m => classify(m) === 'phd');
+  // "committee members" = heads + their members, grouped
+  const committeeMembers = members.filter(m => classify(m) === 'head' || (classify(m) === 'member' && !classify(m).includes('phd')));
+  // For grouping, include heads too so each committee has its head
+  const nonExecNonPhd = members.filter(m => classify(m) === 'head' || classify(m) === 'member');
+  const committeeGroups = groupByCommittee(nonExecNonPhd);
+
+  const totalCount = members.length;
+
+  return (
+    <>
+      <TeamStyles />
 
       {/* ── Hero ── */}
       <section className="team-hero">
